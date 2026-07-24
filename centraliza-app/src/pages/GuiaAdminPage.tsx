@@ -44,7 +44,21 @@ export function GuiaAdminPage() {
           </ul>
         </GuideStep>
 
-        <GuideStep num={2} title="Configurar el circuito de compra">
+        <GuideStep num={2} title="Habilitar las empresas">
+          <p>
+            Tocá <strong>Editar</strong> sobre la fila del usuario y, en{' '}
+            <strong>Empresas habilitadas</strong>, tildá aquellas con las que va a trabajar. Usá el
+            buscador para encontrarlas y los atajos <strong>Todas</strong> /{' '}
+            <strong>Ninguna</strong> para seleccionar en bloque.
+          </p>
+          <div className="note">
+            <strong>Sin ninguna empresa tildada, el usuario no puede cargar pedidos:</strong> en
+            Inicio le va a aparecer un aviso indicándole que contacte a un administrador. El
+            contador arriba de la lista te muestra cuántas lleva habilitadas.
+          </div>
+        </GuideStep>
+
+        <GuideStep num={3} title="Configurar el circuito de compra">
           <p>
             Recién creado, el usuario <strong>todavía no puede enviar pedidos</strong>. Tocá{' '}
             <strong>Editar</strong> sobre su fila y completá, en la sección Workflow de compra:
@@ -65,11 +79,15 @@ export function GuiaAdminPage() {
           </div>
         </GuideStep>
 
-        <GuideStep num={3} title="Verificar">
+        <GuideStep num={4} title="Verificar">
           <p>
             En la tabla de usuarios, las columnas <strong>Workflow compra</strong> y{' '}
             <strong>Tipo doc.</strong> tienen que mostrar valores. Si aparece un guion (—), la
             configuración está incompleta.
+          </p>
+          <p>
+            Las empresas habilitadas se ven abriendo <strong>Editar</strong>: el contador arriba de
+            la lista indica cuántas tiene.
           </p>
         </GuideStep>
       </div>

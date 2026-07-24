@@ -37,11 +37,20 @@ export function GuiaPage() {
           </p>
         </GuideStep>
 
-        <GuideStep num={2} title="Verificar la empresa">
+        <GuideStep num={2} title="Elegir la empresa">
           <p>
-            En <strong>Inicio</strong> vas a ver la empresa con la que estás trabajando. Como hay
-            una sola empresa habilitada, se selecciona sola y no tenés que hacer nada.
+            En <strong>Inicio</strong> seleccionás la empresa para la que vas a cargar el pedido.
+            Solo vas a ver las empresas que un administrador habilitó para tu cuenta. Si te
+            habilitaron una sola, se selecciona automáticamente.
           </p>
+          <p>
+            La empresa elegida queda guardada para las próximas veces, así que solo tenés que
+            cambiarla si vas a trabajar con otra.
+          </p>
+          <div className="note">
+            Si el mensaje dice que no tenés ninguna empresa habilitada, no vas a poder cargar
+            pedidos: pedile a un administrador que te habilite las que necesitás.
+          </div>
         </GuideStep>
 
         <GuideStep num={3} title="Completar los datos del pedido">

@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { getPool, sql } = require('./db');
-const { requireAdmin, getAllowedCompanyCodes } = require('./middleware');
+const { requireAdmin } = require('./middleware');
 const { getFinnegansAccessToken } = require('./finnegans');
 
 const router = express.Router();
@@ -126,15 +126,6 @@ router.post('/users/:id/companies', requireAdmin, async (req, res) => {
     const { codes } = req.body;
     if (!Array.isArray(codes)) return res.status(400).json({ error: 'codes debe ser un array.' });
 
-    const allowed = getAllowedCompanyCodes();
-    if (allowed) {
-      const invalid = codes.filter((c) => !allowed.includes(String(c)));
-      if (invalid.length > 0) {
-        return res.status(400).json({
-          error: `Empresas no habilitadas: ${invalid.join(', ')}. Habilitadas: ${allowed.join(', ')}.`,
-        });
-      }
-    }
 
     const pool = await getPool();
     const tx = new sql.Transaction(pool);
@@ -232,9 +223,8 @@ router.get('/finnegans-tipos-documento', requireAdmin, (_req, res) =>
   finnegansProxy(res, 'TipoDocumentoAPI/list', (rows) => ({ tipos: toOptions(rows) }))
 );
 
-router.get('/finnegans-companies', requireAdmin, (_req, res) => {
-  const allowed = getAllowedCompanyCodes();
-  return finnegansProxy(res, 'empresaSucursal/list', (rows) => ({
+router.get('/finnegans-companies', requireAdmin, (_req, res) =>
+  finnegansProxy(res, 'empresaSucursal/list', (rows) => ({
     companies: rows
       .filter((item) => {
         const a = item.activo ?? item.ACTIVO;
@@ -245,11 +235,9 @@ router.get('/finnegans-companies', requireAdmin, (_req, res) => {
         value: String(item.codigo ?? item.CODIGO ?? item.empresaCodigo ?? item.EmpresaCodigo ?? item.establecimientoCodigo ?? item.EstablecimientoCodigo ?? item.value ?? '').trim(),
       }))
       .filter((c) => c.label && c.value)
-      // El tope global también aplica acá: el admin solo puede asignar empresas habilitadas.
-      .filter((c) => !allowed || allowed.includes(c.value))
       .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' })),
-  }));
-});
+  }))
+);
 
 // ---------- Logs ----------
 

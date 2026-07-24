@@ -252,6 +252,12 @@ function UserEditModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Empresas habilitadas para este usuario
+  const [companies, setCompanies] = useState<SelectOption[]>([]);
+  const [assignedCodes, setAssignedCodes] = useState<string[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
+  const [companyFilter, setCompanyFilter] = useState('');
+
   // Workflow
   const [workflows, setWorkflows] = useState<SelectOption[]>([]);
   const [tipos, setTipos] = useState<SelectOption[]>([]);
@@ -261,6 +267,18 @@ function UserEditModal({
 
   useEffect(() => {
     (async () => {
+      try {
+        const [companiesData, codesData] = await Promise.all([
+          api('/finnegans-companies'),
+          api(`/users/${user.id}/companies`),
+        ]);
+        setCompanies(companiesData.companies ?? []);
+        setAssignedCodes(codesData.codes ?? []);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoadingCompanies(false);
+      }
       // Cargas independientes: si una API de Finnegans no está habilitada
       // (p.ej. TipoDocumentoAPI devuelve 501), la otra lista igual se muestra.
       try {
@@ -280,6 +298,12 @@ function UserEditModal({
     })();
   }, [api, user.id]);
 
+  const toggleCompany = (code: string) => {
+    setAssignedCodes((prev) =>
+      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
+    );
+  };
+
   const save = async () => {
     setSaving(true);
     setError(null);
@@ -287,8 +311,10 @@ function UserEditModal({
       const patch: Record<string, unknown> = { full_name: fullName || null, role };
       if (newPassword.trim()) patch.password = newPassword;
       await api(`/users/${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
-      // Las empresas no se asignan por usuario: el backend aplica un único
-      // conjunto habilitado (ALLOWED_COMPANY_CODES) para toda la organización.
+      await api(`/users/${user.id}/companies`, {
+        method: 'POST',
+        body: JSON.stringify({ codes: assignedCodes }),
+      });
       // Si el código no está en la lista (carga manual), se guarda igual con el código como nombre.
       const wf = workflows.find((w) => w.value === wfCodigo) ?? null;
       const td = tipos.find((t) => t.value === tdCodigo) ?? null;
@@ -333,6 +359,54 @@ function UserEditModal({
             autoComplete="new-password"
           />
         </div>
+
+        <h3 style={{ marginTop: '1rem' }}>Empresas habilitadas</h3>
+        <p className="muted">
+          El usuario solo va a poder cargar pedidos para las empresas que tildes acá. Sin ninguna
+          tildada no verá ninguna empresa y no podrá operar.
+        </p>
+        {loadingCompanies ? (
+          <span className="spinner" />
+        ) : (
+          <>
+            <div className="field" style={{ marginBottom: '0.5rem' }}>
+              <input
+                type="text"
+                value={companyFilter}
+                onChange={(e) => setCompanyFilter(e.target.value)}
+                placeholder="Buscar empresa..."
+              />
+            </div>
+            <div className="company-toolbar">
+              <span className={assignedCodes.length === 0 ? 'chip warning' : 'chip'}>
+                {assignedCodes.length === 0
+                  ? 'Ninguna habilitada'
+                  : `${assignedCodes.length} habilitada${assignedCodes.length > 1 ? 's' : ''}`}
+              </span>
+              <span className="spacer" />
+              <button className="link" onClick={() => setAssignedCodes(companies.map((c) => c.value))}>
+                Todas
+              </button>
+              <button className="link" onClick={() => setAssignedCodes([])}>
+                Ninguna
+              </button>
+            </div>
+            <div className="company-list">
+              {companies
+                .filter((c) => c.label.toLowerCase().includes(companyFilter.trim().toLowerCase()))
+                .map((c) => (
+                  <label key={c.value} className="company-item">
+                    <input
+                      type="checkbox"
+                      checked={assignedCodes.includes(c.value)}
+                      onChange={() => toggleCompany(c.value)}
+                    />
+                    <span>{c.label}</span>
+                  </label>
+                ))}
+            </div>
+          </>
+        )}
 
         <h3 style={{ marginTop: '1rem' }}>Workflow de compra</h3>
         {loadingWf ? (

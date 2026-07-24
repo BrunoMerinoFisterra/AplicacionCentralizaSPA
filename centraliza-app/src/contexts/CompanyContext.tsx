@@ -15,6 +15,8 @@ type CompanyContextType = {
   setSelectedCompanyByValue: (value: string) => Promise<void>;
   clearSelectedCompany: () => Promise<void>;
   loadingCompanies: boolean;
+  /** true si la carga falló (red/API). Distinto de "no tiene empresas asignadas". */
+  loadError: boolean;
   refreshCompanies: () => Promise<void>;
 };
 
@@ -27,6 +29,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
   const [companies, setCompanies] = useState<CompanyOption[]>([]);
   const [selectedCompany, setSelectedCompany] = useState<CompanyOption | null>(null);
   const [loadingCompanies, setLoadingCompanies] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   const loadStoredCompanyValue = async () => {
     try {
@@ -51,6 +54,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
     if (!user?.token) return;
     try {
       setLoadingCompanies(true);
+      setLoadError(false);
 
       const token = await getFinnegansToken(user.token);
 
@@ -93,22 +97,15 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
         }))
         .filter((item) => item.label && item.value);
 
-      // Filtrar por empresas asignadas; lista vacía = sin restricción
-      let allowedCodes: string[] = [];
-      try {
-        const acRes = await fetch(`${API_BASE_URL}/auth/my-companies`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        if (acRes.ok) {
-          const acData = await acRes.json();
-          allowedCodes = acData.codes ?? [];
-        }
-      } catch {
-        // sin restricción si el endpoint falla
-      }
+      // El usuario solo ve las empresas que un administrador le habilitó.
+      // Lista vacía = ninguna empresa disponible (no significa "todas").
+      const acRes = await fetch(`${API_BASE_URL}/auth/my-companies`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      if (!acRes.ok) throw new Error(`my-companies failed: ${acRes.status}`);
+      const allowedCodes: string[] = (await acRes.json()).codes ?? [];
 
-      const filtered =
-        allowedCodes.length > 0 ? options.filter((c) => allowedCodes.includes(c.value)) : options;
+      const filtered = options.filter((c) => allowedCodes.includes(c.value));
 
       setCompanies(filtered);
 
@@ -128,6 +125,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error('Error loading companies:', error);
+      setLoadError(true);
     } finally {
       setLoadingCompanies(false);
     }
@@ -157,6 +155,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
         setSelectedCompanyByValue,
         clearSelectedCompany,
         loadingCompanies,
+        loadError,
         refreshCompanies,
       }}
     >

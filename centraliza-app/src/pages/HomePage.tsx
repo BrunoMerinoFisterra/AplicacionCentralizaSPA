@@ -6,8 +6,14 @@ import { useSubmissions } from '../contexts/SubmissionsContext';
 
 export function HomePage() {
   const { user } = useAuth();
-  const { companies, selectedCompany, setSelectedCompanyByValue, loadingCompanies, refreshCompanies } =
-    useCompany();
+  const {
+    companies,
+    selectedCompany,
+    setSelectedCompanyByValue,
+    loadingCompanies,
+    loadError,
+    refreshCompanies,
+  } = useCompany();
   const { submissions } = useSubmissions();
 
   const pendingCount = submissions.filter((s) => s.status === 'PENDING').length;
@@ -20,21 +26,34 @@ export function HomePage() {
 
       <div className="card">
         <h3>Empresa</h3>
-        <SearchableSelect
-          label="Seleccioná la empresa con la que vas a trabajar"
-          selectedValue={selectedCompany?.value ?? ''}
-          options={companies}
-          onValueChange={(value) => setSelectedCompanyByValue(value)}
-          placeholder="Seleccionar empresa..."
-          loading={loadingCompanies}
-        />
-        {!loadingCompanies && companies.length === 0 && (
-          <p className="muted">
-            No se pudieron cargar las empresas.{' '}
-            <button className="link" onClick={() => refreshCompanies()}>
-              Reintentar
-            </button>
-          </p>
+
+        {!loadingCompanies && companies.length === 0 ? (
+          loadError ? (
+            <div className="error-box">
+              <div className="title">No se pudieron cargar las empresas.</div>
+              <div className="detail">
+                Verificá tu conexión a internet.{' '}
+                <button className="link" onClick={() => refreshCompanies()}>
+                  Reintentar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="note">
+              Tu cuenta no tiene ninguna empresa habilitada, así que todavía no podés cargar
+              pedidos. Pedile a un administrador que te habilite las empresas con las que vas a
+              trabajar.
+            </div>
+          )
+        ) : (
+          <SearchableSelect
+            label="Seleccioná la empresa con la que vas a trabajar"
+            selectedValue={selectedCompany?.value ?? ''}
+            options={companies}
+            onValueChange={(value) => setSelectedCompanyByValue(value)}
+            placeholder="Seleccionar empresa..."
+            loading={loadingCompanies}
+          />
         )}
       </div>
 
