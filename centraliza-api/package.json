@@ -1,0 +1,24 @@
+{
+  "name": "centraliza-api",
+  "version": "1.0.0",
+  "description": "API para Centraliza SPA App - pedidos de compra a Finnegans",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "migrate": "node migrations/run-migration.js"
+  },
+  "type": "commonjs",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mssql": "^12.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

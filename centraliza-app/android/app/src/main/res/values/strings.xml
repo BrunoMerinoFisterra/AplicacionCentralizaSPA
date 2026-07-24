@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Centraliza SPA App</string>
+    <string name="title_activity_main">Centraliza SPA App</string>
+    <string name="package_name">com.fisterra.centraliza</string>
+    <string name="custom_url_scheme">com.fisterra.centraliza</string>
+</resources>

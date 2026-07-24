@@ -1,0 +1,27 @@
+import { Preferences } from '@capacitor/preferences';
+
+const TTL_MS = 24 * 60 * 60 * 1000;
+const PREFIX = 'centraliza_cache_';
+
+type CacheEntry<T> = { data: T; ts: number };
+
+export async function getCached<T>(key: string): Promise<T | null> {
+  try {
+    const { value } = await Preferences.get({ key: PREFIX + key });
+    if (!value) return null;
+    const entry: CacheEntry<T> = JSON.parse(value);
+    if (Date.now() - entry.ts > TTL_MS) return null;
+    return entry.data;
+  } catch {
+    return null;
+  }
+}
+
+export async function setCached<T>(key: string, data: T): Promise<void> {
+  try {
+    const entry: CacheEntry<T> = { data, ts: Date.now() };
+    await Preferences.set({ key: PREFIX + key, value: JSON.stringify(entry) });
+  } catch {
+    // ignorar errores de cache
+  }
+}

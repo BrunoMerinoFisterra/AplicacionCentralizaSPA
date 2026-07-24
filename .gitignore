@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Capacitor / Android
+centraliza-app/android/app/build/
+centraliza-app/android/build/
+centraliza-app/android/.gradle/
+centraliza-app/android/local.properties
+centraliza-app/android/app/release/
