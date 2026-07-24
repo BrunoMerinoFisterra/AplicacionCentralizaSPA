@@ -26,4 +26,14 @@ function requireAdmin(req, res, next) {
   });
 }
 
-module.exports = { requireUser, requireAdmin };
+// Tope global de empresas habilitadas (ALLOWED_COMPANY_CODES="16,82").
+// Si está definido, ningún usuario puede ver ni operar otra empresa, aunque
+// tenga una asignación individual distinta o ninguna asignación.
+function getAllowedCompanyCodes() {
+  const raw = process.env.ALLOWED_COMPANY_CODES;
+  if (!raw) return null; // sin tope: comportamiento original
+  const codes = raw.split(',').map((c) => c.trim()).filter(Boolean);
+  return codes.length > 0 ? codes : null;
+}
+
+module.exports = { requireUser, requireAdmin, getAllowedCompanyCodes };

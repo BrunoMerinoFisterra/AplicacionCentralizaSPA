@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { getPool, sql } = require('./db');
-const { requireUser } = require('./middleware');
+const { requireUser, getAllowedCompanyCodes } = require('./middleware');
 
 const router = express.Router();
 
@@ -60,14 +60,25 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Empresas asignadas al usuario; lista vacía = sin restricción (mismo criterio que FSTrack)
+// Empresas visibles para el usuario.
+// - Sin ALLOWED_COMPANY_CODES: asignaciones del usuario; lista vacía = sin restricción.
+// - Con ALLOWED_COMPANY_CODES: ese tope global manda siempre. Se devuelve la
+//   intersección con las asignaciones del usuario, o el tope entero si no tiene.
 router.get('/my-companies', requireUser, async (req, res) => {
   try {
     const pool = await getPool();
     const result = await pool.request()
       .input('user_id', sql.Int, req.userId)
       .query(`SELECT company_code FROM centraliza_user_companies WHERE user_id = @user_id`);
-    return res.json({ codes: result.recordset.map((r) => r.company_code) });
+    const userCodes = result.recordset.map((r) => r.company_code);
+
+    const allowed = getAllowedCompanyCodes();
+    if (!allowed) return res.json({ codes: userCodes });
+
+    const codes = userCodes.length > 0
+      ? userCodes.filter((c) => allowed.includes(c))
+      : allowed;
+    return res.json({ codes });
   } catch (err) {
     console.error('GET /auth/my-companies error', err);
     return res.status(500).json({ error: 'Error interno del servidor.' });

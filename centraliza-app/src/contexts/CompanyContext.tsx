@@ -113,9 +113,16 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
       setCompanies(filtered);
 
       const storedValue = await loadStoredCompanyValue();
-      if (storedValue) {
-        const restored = filtered.find((company) => company.value === storedValue) || null;
+      const restored = storedValue
+        ? filtered.find((company) => company.value === storedValue) ?? null
+        : null;
+
+      if (restored) {
         setSelectedCompany(restored);
+      } else if (filtered.length === 1) {
+        // Una sola empresa habilitada: no tiene sentido pedir que la elijan.
+        setSelectedCompany(filtered[0]);
+        await Preferences.set({ key: COMPANY_STORAGE_KEY, value: filtered[0].value });
       } else {
         setSelectedCompany(null);
       }
