@@ -278,18 +278,22 @@ function UserEditModal({
       } finally {
         setLoadingCompanies(false);
       }
+      // Cargas independientes: si una API de Finnegans no está habilitada
+      // (p.ej. TipoDocumentoAPI devuelve 501), la otra lista igual se muestra.
       try {
-        const [wfData, tdData] = await Promise.all([
-          api('/finnegans-workflows'),
-          api('/finnegans-tipos-documento'),
-        ]);
+        const wfData = await api('/finnegans-workflows');
         setWorkflows(wfData.workflows ?? []);
+      } catch (err) {
+        console.error('Error loading workflows:', err);
+      }
+      try {
+        const tdData = await api('/finnegans-tipos-documento');
         setTipos(tdData.tipos ?? []);
       } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoadingWf(false);
+        // TipoDocumentoAPI no habilitada en esta instancia — se permite carga manual
+        console.error('Error loading tipos de documento:', err);
       }
+      setLoadingWf(false);
     })();
   }, [api, user.id]);
 
@@ -310,15 +314,16 @@ function UserEditModal({
         method: 'POST',
         body: JSON.stringify({ codes: assignedCodes }),
       });
+      // Si el código no está en la lista (carga manual), se guarda igual con el código como nombre.
       const wf = workflows.find((w) => w.value === wfCodigo) ?? null;
       const td = tipos.find((t) => t.value === tdCodigo) ?? null;
       await api(`/users/${user.id}/workflow`, {
         method: 'POST',
         body: JSON.stringify({
-          workflow_codigo: wf?.value ?? null,
-          workflow_nombre: wf?.label ?? null,
-          tipodoc_codigo: td?.value ?? null,
-          tipodoc_nombre: td?.label ?? null,
+          workflow_codigo: wfCodigo.trim() || null,
+          workflow_nombre: wf?.label ?? (wfCodigo.trim() || null),
+          tipodoc_codigo: tdCodigo.trim() || null,
+          tipodoc_nombre: td?.label ?? (tdCodigo.trim() || null),
         }),
       });
       await onSaved();
@@ -385,13 +390,29 @@ function UserEditModal({
               onValueChange={setWfCodigo}
               placeholder="Seleccionar workflow..."
             />
-            <SearchableSelect
-              label="Tipo de documento"
-              selectedValue={tdCodigo}
-              options={tipos}
-              onValueChange={setTdCodigo}
-              placeholder="Seleccionar tipo de documento..."
-            />
+            {tipos.length > 0 ? (
+              <SearchableSelect
+                label="Tipo de documento"
+                selectedValue={tdCodigo}
+                options={tipos}
+                onValueChange={setTdCodigo}
+                placeholder="Seleccionar tipo de documento..."
+              />
+            ) : (
+              <div className="field">
+                <label>Tipo de documento (código)</label>
+                <input
+                  value={tdCodigo}
+                  onChange={(e) => setTdCodigo(e.target.value)}
+                  placeholder="PC"
+                />
+                <p className="muted">
+                  La lista no está disponible en esta instancia de Finnegans (TipoDocumentoAPI
+                  devuelve 501). Ingresá el código del tipo de documento tal como figura en
+                  Finnegans.
+                </p>
+              </div>
+            )}
           </>
         )}
 

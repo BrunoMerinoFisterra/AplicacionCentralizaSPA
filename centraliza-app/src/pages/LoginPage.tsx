@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { Logo } from '../components/Logo';
 import { useAuth } from '../contexts/AuthContext';
 
 export function LoginPage() {
@@ -28,7 +29,9 @@ export function LoginPage() {
   return (
     <div className="login-wrap">
       <form className="login-card" onSubmit={handleSubmit}>
-        <h1>Centraliza</h1>
+        <div className="login-brand">
+          <Logo size="lg" />
+        </div>
         <div className="field">
           <label htmlFor="username">Usuario</label>
           <input

@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Logo } from './Logo';
 
 export function Layout() {
   const { user, isAdmin, signOut } = useAuth();
@@ -13,7 +14,9 @@ export function Layout() {
   return (
     <>
       <nav className="navbar">
-        <span className="brand">Centraliza</span>
+        <span className="brand">
+          <Logo size="sm" />
+        </span>
         <NavLink to="/" end>
           Inicio
         </NavLink>

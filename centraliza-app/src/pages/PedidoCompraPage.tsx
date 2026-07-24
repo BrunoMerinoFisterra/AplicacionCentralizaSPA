@@ -52,20 +52,40 @@ export function PedidoCompraPage() {
     setLoadingProductos(true);
     try {
       const token = await getFinnegansToken(user.token);
-      const response = await fetch(
+
+      // 1) Reporte a medida (SP que filtra activos + comprables del lado del servidor).
+      //    No existe en todas las instancias de Finnegans — si falla, se usa la API estándar.
+      let data: unknown[] | null = null;
+      const reportRes = await fetch(
         `https://api.finneg.com/api/reports/PRODUCTOSCOMPRAAPI?ACCESS_TOKEN=${token}`
-      );
-      if (!response.ok) throw new Error(`PRODUCTOSCOMPRAAPI request failed: ${response.status}`);
-      const data = await response.json();
-      // El SP ya filtra activos y comprables del lado del servidor.
-      const options: SelectOption[] = (Array.isArray(data) ? data : [])
-        .map((item: Record<string, unknown>) => ({
-          label: String(
-            item.NOMBRE ?? item.Nombre ?? item.nombre ?? item.DESCRIPCION ?? item.descripcion ??
-            item.CODIGO ?? item.Codigo ?? item.codigo ?? ''
-          ).trim(),
-          value: String(item.CODIGO ?? item.Codigo ?? item.codigo ?? '').trim(),
-        }))
+      ).catch(() => null);
+      if (reportRes?.ok) {
+        const parsed = await reportRes.json();
+        if (Array.isArray(parsed)) data = parsed;
+      }
+
+      // 2) Fallback: API estándar Producto/list (filtra solo activos; trae todos los productos).
+      if (!data) {
+        const listRes = await fetch(`https://api.finneg.com/api/Producto/list?ACCESS_TOKEN=${token}`);
+        if (!listRes.ok) throw new Error(`Producto/list request failed: ${listRes.status}`);
+        const parsed = await listRes.json();
+        data = (Array.isArray(parsed) ? parsed : []).filter((item: Record<string, unknown>) => {
+          const activo = item.activo ?? item.ACTIVO ?? item.Activo;
+          return activo === true || activo === 'true' || activo === 1 || activo === '1';
+        });
+      }
+
+      const options: SelectOption[] = data
+        .map((raw) => {
+          const item = raw as Record<string, unknown>;
+          return {
+            label: String(
+              item.NOMBRE ?? item.Nombre ?? item.nombre ?? item.DESCRIPCION ?? item.descripcion ??
+              item.CODIGO ?? item.Codigo ?? item.codigo ?? ''
+            ).trim(),
+            value: String(item.CODIGO ?? item.Codigo ?? item.codigo ?? '').trim(),
+          };
+        })
         .filter((item) => item.label && item.value)
         .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
       setProductoOptions(options);
@@ -141,24 +161,44 @@ export function PedidoCompraPage() {
 
   return (
     <div className="page">
-      <h1>Pedido de Compra</h1>
-      <p className="muted">{selectedCompany ? selectedCompany.label : 'Sin empresa seleccionada'}</p>
+      <div className="page-header">
+        <h1>Pedido de Compra</h1>
+        {selectedCompany ? (
+          <span className="chip">{selectedCompany.label}</span>
+        ) : (
+          <span className="chip warning">Sin empresa seleccionada</span>
+        )}
+      </div>
 
       <div className="card">
-        <h3>Datos del pedido</h3>
-        <div className="field">
-          <label>Fecha</label>
-          <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
-        </div>
-        <div className="field">
-          <label>Descripción</label>
-          <input type="text" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+        <h3 className="section-title">Datos del pedido</h3>
+        <div className="form-row">
+          <div className="field narrow">
+            <label>Fecha</label>
+            <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          </div>
+          <div className="field">
+            <label>Descripción</label>
+            <input
+              type="text"
+              value={descripcion}
+              onChange={(e) => setDescripcion(e.target.value)}
+              placeholder="Descripción general del pedido (opcional)"
+            />
+          </div>
         </div>
 
-        <h3>Ítems</h3>
+        <h3 className="section-title">Ítems</h3>
         {items.map((item, index) => (
-          <div key={index} className="mini-card">
-            <strong>Ítem {index + 1}</strong>
+          <div key={index} className="item-card">
+            <div className="item-card-header">
+              <span className="item-title">Ítem {index + 1}</span>
+              {items.length > 1 && (
+                <button className="link-danger" onClick={() => removeItem(index)}>
+                  Quitar
+                </button>
+              )}
+            </div>
             <SearchableSelect
               label="Producto"
               selectedValue={item.ProductoCodigo}
@@ -167,37 +207,36 @@ export function PedidoCompraPage() {
               placeholder="Seleccionar producto..."
               loading={loadingProductos}
             />
-            <div className="field">
-              <label>Cantidad</label>
-              <input
-                type="number"
-                inputMode="decimal"
-                value={item.Cantidad}
-                onChange={(e) => updateItem(index, 'Cantidad', e.target.value)}
-              />
-            </div>
-            <div className="field">
-              <label>Descripción</label>
-              <input
-                type="text"
-                value={item.Descripcion}
-                onChange={(e) => updateItem(index, 'Descripcion', e.target.value)}
-              />
-            </div>
-            <div className="btn-row">
-              <button onClick={addItem}>Agregar ítem</button>
-              {items.length > 1 && (
-                <button className="danger" onClick={() => removeItem(index)}>
-                  Quitar ítem
-                </button>
-              )}
+            <div className="form-row">
+              <div className="field narrow">
+                <label>Cantidad</label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  value={item.Cantidad}
+                  onChange={(e) => updateItem(index, 'Cantidad', e.target.value)}
+                />
+              </div>
+              <div className="field">
+                <label>Descripción</label>
+                <input
+                  type="text"
+                  value={item.Descripcion}
+                  onChange={(e) => updateItem(index, 'Descripcion', e.target.value)}
+                  placeholder="Detalle del ítem (opcional)"
+                />
+              </div>
             </div>
           </div>
         ))}
 
-        <div className="btn-row">
-          <button className="primary" onClick={handleSendPress} disabled={loading}>
-            {loading ? 'Enviando...' : 'Enviar'}
+        <button className="btn-add" onClick={addItem}>
+          + Agregar ítem
+        </button>
+
+        <div className="form-footer">
+          <button className="primary btn-lg" onClick={handleSendPress} disabled={loading}>
+            {loading ? 'Enviando...' : 'Enviar pedido'}
           </button>
           {loading && <span className="spinner" />}
         </div>
