@@ -612,6 +612,11 @@ th {
   background: var(--primary-soft);
 }
 
+.note a {
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+
 .status-legend {
   display: flex;
   flex-direction: column;

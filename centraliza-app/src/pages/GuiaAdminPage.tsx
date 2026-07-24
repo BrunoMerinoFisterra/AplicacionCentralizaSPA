@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { GuideStep } from '../components/GuideStep';
 
 // Guía del panel de administración. Solo visible para cuentas con rol admin.
@@ -12,8 +13,8 @@ export function GuiaAdminPage() {
       <div className="card">
         <div className="note info" style={{ marginTop: 0 }}>
           Esta guía cubre solo la pestaña <strong>Administración</strong>. Para el uso diario de la
-          aplicación (cargar pedidos, revisar envíos) mirá la <strong>Guía de uso</strong>, que
-          también tenés disponible.
+          aplicación (cargar pedidos, revisar envíos) tenés la{' '}
+          <Link to="/guia">Guía de uso</Link>, que también está disponible para tu cuenta.
         </div>
       </div>
 
@@ -119,19 +120,6 @@ export function GuiaAdminPage() {
             administrador</strong>. Así se evita que la organización quede sin ningún administrador.
             Si necesitás ceder el puesto, pedile a otro administrador que haga el cambio.
           </div>
-        </div>
-      </div>
-
-      <div className="card">
-        <h3 className="section-title">Empresa habilitada</h3>
-        <p className="muted">
-          La aplicación opera contra una única empresa de Finnegans, definida a nivel del servidor.
-          Por eso el panel no tiene selector de empresas: todos los usuarios trabajan con la misma y
-          se les asigna automáticamente.
-        </p>
-        <div className="note">
-          Habilitar otra empresa o cambiar la actual es una modificación de configuración del
-          servidor, no algo que se haga desde este panel. Hay que pedírselo al equipo técnico.
         </div>
       </div>
 

@@ -22,9 +22,9 @@ export function Layout() {
         </NavLink>
         <NavLink to="/pedido-compra">Pedido de Compra</NavLink>
         <NavLink to="/envios">Envíos</NavLink>
-        <NavLink to="/guia">Guía</NavLink>
         {isAdmin && <NavLink to="/admin">Administración</NavLink>}
-        {/* El admin ve ambas guías: la de uso general y la del panel */}
+        {/* Las dos guías van juntas al final: el admin ve ambas */}
+        <NavLink to="/guia">Guía</NavLink>
         {isAdmin && <NavLink to="/guia-admin">Guía Admin</NavLink>}
         <span className="spacer" />
         <span className="user-chip">{user?.fullName || user?.username}</span>

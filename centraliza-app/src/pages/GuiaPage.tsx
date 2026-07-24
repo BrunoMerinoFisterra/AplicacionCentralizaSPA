@@ -1,13 +1,27 @@
+import { Link } from 'react-router-dom';
 import { GuideStep } from '../components/GuideStep';
+import { useAuth } from '../contexts/AuthContext';
 
 // Guía de uso para todos los usuarios.
 export function GuiaPage() {
+  const { isAdmin } = useAuth();
+
   return (
     <div className="page">
       <h1>Guía de uso</h1>
       <p className="guide-intro">
         Cómo cargar un pedido de compra y enviarlo a Finnegans, paso a paso.
       </p>
+
+      {isAdmin && (
+        <div className="card">
+          <div className="note info" style={{ marginTop: 0 }}>
+            Como tu cuenta es administradora, también tenés la{' '}
+            <Link to="/guia-admin">Guía del administrador</Link>, con la gestión de usuarios y la
+            lectura de logs.
+          </div>
+        </div>
+      )}
 
       <div className="card">
         <h3 className="section-title">Cargar un pedido de compra</h3>
