@@ -37,27 +37,17 @@ export function GuiaPage() {
           </p>
         </GuideStep>
 
-        <GuideStep num={2} title="Elegir la empresa">
+        <GuideStep num={2} title="Completar los datos del pedido">
           <p>
-            En <strong>Inicio</strong> seleccionás la empresa para la que vas a cargar el pedido.
-            Solo vas a ver las empresas que un administrador habilitó para tu cuenta. Si te
-            habilitaron una sola, se selecciona automáticamente.
-          </p>
-          <p>
-            La empresa elegida queda guardada para las próximas veces, así que solo tenés que
-            cambiarla si vas a trabajar con otra.
-          </p>
-          <div className="note">
-            Si el mensaje dice que no tenés ninguna empresa habilitada, no vas a poder cargar
-            pedidos: pedile a un administrador que te habilite las que necesitás.
-          </div>
-        </GuideStep>
-
-        <GuideStep num={3} title="Completar los datos del pedido">
-          <p>
-            Entrá a <strong>Pedido de Compra</strong>. Arriba completás:
+            Entrá a <strong>Pedido de Compra</strong> desde el menú o desde el acceso en Inicio.
+            Arriba completás:
           </p>
           <ul>
+            <li>
+              <strong>Empresa</strong> — para cuál vas a cargar el pedido. Solo vas a ver las
+              empresas que un administrador habilitó para tu cuenta; si te habilitaron una sola, se
+              selecciona automáticamente. La elección queda guardada para la próxima vez.
+            </li>
             <li>
               <strong>Fecha</strong> — viene con la fecha de hoy; cambiala si el pedido corresponde
               a otro día.
@@ -66,9 +56,14 @@ export function GuiaPage() {
               <strong>Descripción</strong> — opcional, para identificar el pedido en general.
             </li>
           </ul>
+          <div className="note">
+            Si en lugar del campo Empresa ves un mensaje diciendo que no tenés ninguna habilitada,
+            no vas a poder enviar el pedido: pedile a un administrador que te habilite las que
+            necesitás.
+          </div>
         </GuideStep>
 
-        <GuideStep num={4} title="Agregar los ítems">
+        <GuideStep num={3} title="Agregar los ítems">
           <p>Por cada producto que necesites pedir, completá:</p>
           <ul>
             <li>
@@ -93,7 +88,7 @@ export function GuiaPage() {
           </div>
         </GuideStep>
 
-        <GuideStep num={5} title="Revisar y enviar">
+        <GuideStep num={4} title="Revisar y enviar">
           <p>
             Al tocar <strong>Enviar pedido</strong> se abre una ventana con el resumen exacto de lo
             que se va a enviar. Revisalo y confirmá. Si algo está mal, cancelá y corregí.

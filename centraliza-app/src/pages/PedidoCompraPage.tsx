@@ -25,7 +25,14 @@ const createEmptyItem = (): CompraItem => ({
 
 export function PedidoCompraPage() {
   const { user } = useAuth();
-  const { selectedCompany } = useCompany();
+  const {
+    companies,
+    selectedCompany,
+    setSelectedCompanyByValue,
+    loadingCompanies,
+    loadError,
+    refreshCompanies,
+  } = useCompany();
   const { addAndSubmit } = useSubmissions();
   const { workflow } = useWorkflow();
   const navigate = useNavigate();
@@ -40,6 +47,8 @@ export function PedidoCompraPage() {
   const [fecha, setFecha] = useState(getTodayDate());
   const [descripcion, setDescripcion] = useState('');
   const [items, setItems] = useState<CompraItem[]>([createEmptyItem()]);
+
+  const sinEmpresas = !loadingCompanies && !loadError && companies.length === 0;
 
   const loadProductos = async () => {
     if (!user?.token) return;
@@ -129,7 +138,7 @@ export function PedidoCompraPage() {
 
   const handleSendPress = () => {
     if (!selectedCompany) {
-      setError({ title: 'Seleccioná una empresa en Inicio antes de enviar.' });
+      setError({ title: 'Seleccioná la empresa antes de enviar el pedido.' });
       return;
     }
     if (!workflow.compra) {
@@ -163,15 +172,37 @@ export function PedidoCompraPage() {
     <div className="page">
       <div className="page-header">
         <h1>Pedido de Compra</h1>
-        {selectedCompany ? (
-          <span className="chip">{selectedCompany.label}</span>
-        ) : (
-          <span className="chip warning">Sin empresa seleccionada</span>
-        )}
       </div>
 
       <div className="card">
         <h3 className="section-title">Datos del pedido</h3>
+
+        {sinEmpresas ? (
+          <div className="note">
+            Tu cuenta no tiene ninguna empresa habilitada, así que no podés cargar pedidos. Pedile a
+            un administrador que te habilite las empresas con las que vas a trabajar.
+          </div>
+        ) : loadError ? (
+          <div className="error-box">
+            <div className="title">No se pudieron cargar las empresas.</div>
+            <div className="detail">
+              Verificá tu conexión a internet.{' '}
+              <button className="link" onClick={() => refreshCompanies()}>
+                Reintentar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <SearchableSelect
+            label="Empresa"
+            selectedValue={selectedCompany?.value ?? ''}
+            options={companies}
+            onValueChange={(value) => setSelectedCompanyByValue(value)}
+            placeholder="Seleccionar empresa..."
+            loading={loadingCompanies}
+          />
+        )}
+
         <div className="form-row">
           <div className="field narrow">
             <label>Fecha</label>
@@ -235,7 +266,11 @@ export function PedidoCompraPage() {
         </button>
 
         <div className="form-footer">
-          <button className="primary btn-lg" onClick={handleSendPress} disabled={loading}>
+          <button
+            className="primary btn-lg"
+            onClick={handleSendPress}
+            disabled={loading || sinEmpresas}
+          >
             {loading ? 'Enviando...' : 'Enviar pedido'}
           </button>
           {loading && <span className="spinner" />}

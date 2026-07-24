@@ -52,9 +52,10 @@ export function GuiaAdminPage() {
             <strong>Ninguna</strong> para seleccionar en bloque.
           </p>
           <div className="note">
-            <strong>Sin ninguna empresa tildada, el usuario no puede cargar pedidos:</strong> en
-            Inicio le va a aparecer un aviso indicándole que contacte a un administrador. El
-            contador arriba de la lista te muestra cuántas lleva habilitadas.
+            <strong>Sin ninguna empresa tildada, el usuario no puede cargar pedidos:</strong> en el
+            formulario de Pedido de Compra, en lugar del campo Empresa le va a aparecer un aviso
+            indicándole que contacte a un administrador. El contador arriba de la lista te muestra
+            cuántas lleva habilitadas.
           </div>
         </GuideStep>
 
