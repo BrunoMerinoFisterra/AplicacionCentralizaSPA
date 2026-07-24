@@ -252,11 +252,6 @@ function UserEditModal({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Empresas
-  const [companies, setCompanies] = useState<SelectOption[]>([]);
-  const [assignedCodes, setAssignedCodes] = useState<string[]>([]);
-  const [loadingCompanies, setLoadingCompanies] = useState(true);
-
   // Workflow
   const [workflows, setWorkflows] = useState<SelectOption[]>([]);
   const [tipos, setTipos] = useState<SelectOption[]>([]);
@@ -266,18 +261,6 @@ function UserEditModal({
 
   useEffect(() => {
     (async () => {
-      try {
-        const [companiesData, codesData] = await Promise.all([
-          api('/finnegans-companies'),
-          api(`/users/${user.id}/companies`),
-        ]);
-        setCompanies(companiesData.companies ?? []);
-        setAssignedCodes(codesData.codes ?? []);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoadingCompanies(false);
-      }
       // Cargas independientes: si una API de Finnegans no está habilitada
       // (p.ej. TipoDocumentoAPI devuelve 501), la otra lista igual se muestra.
       try {
@@ -297,12 +280,6 @@ function UserEditModal({
     })();
   }, [api, user.id]);
 
-  const toggleCompany = (code: string) => {
-    setAssignedCodes((prev) =>
-      prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
-    );
-  };
-
   const save = async () => {
     setSaving(true);
     setError(null);
@@ -310,10 +287,8 @@ function UserEditModal({
       const patch: Record<string, unknown> = { full_name: fullName || null, role };
       if (newPassword.trim()) patch.password = newPassword;
       await api(`/users/${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
-      await api(`/users/${user.id}/companies`, {
-        method: 'POST',
-        body: JSON.stringify({ codes: assignedCodes }),
-      });
+      // Las empresas no se asignan por usuario: el backend aplica un único
+      // conjunto habilitado (ALLOWED_COMPANY_CODES) para toda la organización.
       // Si el código no está en la lista (carga manual), se guarda igual con el código como nombre.
       const wf = workflows.find((w) => w.value === wfCodigo) ?? null;
       const td = tipos.find((t) => t.value === tdCodigo) ?? null;
@@ -358,25 +333,6 @@ function UserEditModal({
             autoComplete="new-password"
           />
         </div>
-
-        <h3 style={{ marginTop: '1rem' }}>Empresas asignadas</h3>
-        <p className="muted">Sin selección = acceso a todas las empresas.</p>
-        {loadingCompanies ? (
-          <span className="spinner" />
-        ) : (
-          <div className="mini-card" style={{ maxHeight: 180, overflowY: 'auto' }}>
-            {companies.map((c) => (
-              <label key={c.value} style={{ display: 'block', padding: '0.2rem 0' }}>
-                <input
-                  type="checkbox"
-                  checked={assignedCodes.includes(c.value)}
-                  onChange={() => toggleCompany(c.value)}
-                />{' '}
-                {c.label}
-              </label>
-            ))}
-          </div>
-        )}
 
         <h3 style={{ marginTop: '1rem' }}>Workflow de compra</h3>
         {loadingWf ? (

@@ -7,6 +7,8 @@ import { SubmissionsProvider } from './contexts/SubmissionsContext';
 import { WorkflowProvider } from './contexts/WorkflowContext';
 import { AdminPage } from './pages/AdminPage';
 import { EnviosPage } from './pages/EnviosPage';
+import { GuiaAdminPage } from './pages/GuiaAdminPage';
+import { GuiaPage } from './pages/GuiaPage';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { PedidoCompraPage } from './pages/PedidoCompraPage';
@@ -26,8 +28,10 @@ function App() {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/pedido-compra" element={<PedidoCompraPage />} />
                     <Route path="/envios" element={<EnviosPage />} />
+                    <Route path="/guia" element={<GuiaPage />} />
                     <Route element={<RequireAdmin />}>
                       <Route path="/admin" element={<AdminPage />} />
+                      <Route path="/guia-admin" element={<GuiaAdminPage />} />
                     </Route>
                   </Route>
                 </Route>

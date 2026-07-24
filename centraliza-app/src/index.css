@@ -532,6 +532,107 @@ th {
   to { transform: rotate(360deg); }
 }
 
+/* ---------- Guías ---------- */
+
+.guide-intro {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.guide-step {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.guide-step:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.guide-step:first-child {
+  padding-top: 0;
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--brand-blue);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.step-body h4 {
+  margin: 0.25rem 0 0.35rem;
+  font-size: 1rem;
+}
+
+.step-body p {
+  margin: 0 0 0.4rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.step-body ul {
+  margin: 0.35rem 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.step-body strong {
+  color: var(--text);
+}
+
+.note {
+  border-left: 3px solid var(--brand-orange);
+  background: var(--warning-bg);
+  padding: 0.6rem 0.85rem;
+  border-radius: 0 8px 8px 0;
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.note.info {
+  border-left-color: var(--brand-blue);
+  background: var(--primary-soft);
+}
+
+.status-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.status-legend-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.status-legend-row .badge {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
 /* ---------- Tabs del admin ---------- */
 
 .tabs {
