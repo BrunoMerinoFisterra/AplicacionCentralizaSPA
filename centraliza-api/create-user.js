@@ -2,7 +2,7 @@
 // Uso: node create-user.js <username> <password> [full_name] [role]
 //   ej: node create-user.js admin MiClave123 "Administrador" admin
 require('dotenv').config();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { getPool, sql } = require('./src/db');
 
 async function main() {
