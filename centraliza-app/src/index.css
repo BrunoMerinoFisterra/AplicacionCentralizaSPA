@@ -131,7 +131,8 @@ h1, h2, h3 {
 }
 
 .app-footer strong {
-  color: var(--brand-blue);
+  /* Rojo de marca de Fisterra */
+  color: #d32f2f;
   font-weight: 700;
 }
 
