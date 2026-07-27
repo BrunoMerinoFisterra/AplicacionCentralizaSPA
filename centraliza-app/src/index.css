@@ -117,6 +117,24 @@ h1, h2, h3 {
 
 /* ---------- Layout ---------- */
 
+.app-main {
+  flex: 1;
+}
+
+.app-footer {
+  padding: 0.9rem 1rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  letter-spacing: 0.02em;
+}
+
+.app-footer strong {
+  color: var(--brand-blue);
+  font-weight: 700;
+}
+
 .page {
   width: 100%;
   max-width: 760px;

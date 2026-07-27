@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { Footer } from '../components/Footer';
 import { Logo } from '../components/Logo';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -27,6 +28,7 @@ export function LoginPage() {
   };
 
   return (
+    <>
     <div className="login-wrap">
       <form className="login-card" onSubmit={handleSubmit}>
         <div className="login-brand">
@@ -63,5 +65,7 @@ export function LoginPage() {
         )}
       </form>
     </div>
+    <Footer />
+    </>
   );
 }

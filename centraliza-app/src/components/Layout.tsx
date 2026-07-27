@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Footer } from './Footer';
 import { Logo } from './Logo';
 
 export function Layout() {
@@ -32,7 +33,10 @@ export function Layout() {
           Salir
         </button>
       </nav>
-      <Outlet />
+      <main className="app-main">
+        <Outlet />
+      </main>
+      <Footer />
     </>
   );
 }
