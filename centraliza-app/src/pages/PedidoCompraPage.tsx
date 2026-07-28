@@ -45,6 +45,7 @@ export function PedidoCompraPage() {
   const [loadingProductos, setLoadingProductos] = useState(false);
 
   const [fecha, setFecha] = useState(getTodayDate());
+  const [fechaProximoPaso, setFechaProximoPaso] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [items, setItems] = useState<CompraItem[]>([createEmptyItem()]);
 
@@ -108,6 +109,9 @@ export function PedidoCompraPage() {
 
   useEffect(() => {
     loadProductos();
+    // Re-consultar las empresas habilitadas al entrar: si un admin acaba de
+    // asignar una, aparece sin necesidad de recargar la página.
+    refreshCompanies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -125,6 +129,7 @@ export function PedidoCompraPage() {
     cleanObject({
       WorkflowCodigo: workflow.compra?.codigo || null,
       Fecha: fecha || null,
+      FechaProximoPaso: fechaProximoPaso || null,
       EmpresaCodigo: selectedCompany?.value || null,
       TransaccionSubtipoCodigo: workflow.compra?.subtipoCodigo || null,
       TransaccionTipoCodigo: 'OPER',
@@ -207,6 +212,14 @@ export function PedidoCompraPage() {
           <div className="field narrow">
             <label>Fecha</label>
             <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          </div>
+          <div className="field narrow">
+            <label>Fecha próximo paso</label>
+            <input
+              type="date"
+              value={fechaProximoPaso}
+              onChange={(e) => setFechaProximoPaso(e.target.value)}
+            />
           </div>
           <div className="field">
             <label>Descripción</label>
