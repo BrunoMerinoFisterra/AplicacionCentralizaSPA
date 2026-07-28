@@ -15,12 +15,14 @@ type CompraItem = {
   ProductoCodigo: string;
   Cantidad: string;
   Descripcion: string;
+  FechaProximoPaso: string;
 };
 
 const createEmptyItem = (): CompraItem => ({
   ProductoCodigo: '',
   Cantidad: '',
   Descripcion: '',
+  FechaProximoPaso: '',
 });
 
 export function PedidoCompraPage() {
@@ -45,7 +47,6 @@ export function PedidoCompraPage() {
   const [loadingProductos, setLoadingProductos] = useState(false);
 
   const [fecha, setFecha] = useState(getTodayDate());
-  const [fechaProximoPaso, setFechaProximoPaso] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [items, setItems] = useState<CompraItem[]>([createEmptyItem()]);
 
@@ -129,7 +130,6 @@ export function PedidoCompraPage() {
     cleanObject({
       WorkflowCodigo: workflow.compra?.codigo || null,
       Fecha: fecha || null,
-      FechaProximoPaso: fechaProximoPaso || null,
       EmpresaCodigo: selectedCompany?.value || null,
       TransaccionSubtipoCodigo: workflow.compra?.subtipoCodigo || null,
       TransaccionTipoCodigo: 'OPER',
@@ -138,6 +138,7 @@ export function PedidoCompraPage() {
         ProductoCodigo: item.ProductoCodigo || null,
         Cantidad: toNumberOrNull(item.Cantidad),
         Descripcion: item.Descripcion || null,
+        FechaProximoPaso: item.FechaProximoPaso || null,
       })),
     }) as object;
 
@@ -213,14 +214,6 @@ export function PedidoCompraPage() {
             <label>Fecha</label>
             <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
           </div>
-          <div className="field narrow">
-            <label>Fecha próximo paso</label>
-            <input
-              type="date"
-              value={fechaProximoPaso}
-              onChange={(e) => setFechaProximoPaso(e.target.value)}
-            />
-          </div>
           <div className="field">
             <label>Descripción</label>
             <input
@@ -259,6 +252,14 @@ export function PedidoCompraPage() {
                   inputMode="decimal"
                   value={item.Cantidad}
                   onChange={(e) => updateItem(index, 'Cantidad', e.target.value)}
+                />
+              </div>
+              <div className="field narrow">
+                <label>Fecha próximo paso</label>
+                <input
+                  type="date"
+                  value={item.FechaProximoPaso}
+                  onChange={(e) => updateItem(index, 'FechaProximoPaso', e.target.value)}
                 />
               </div>
               <div className="field">
