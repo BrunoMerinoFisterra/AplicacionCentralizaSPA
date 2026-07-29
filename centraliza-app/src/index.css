@@ -87,22 +87,52 @@ h1, h2, h3 {
   display: inline-flex;
 }
 
+.navbar .brand img {
+  transition: transform 0.3s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+
+.navbar .brand img:hover {
+  transform: scale(1.05) rotate(-1deg);
+}
+
 .navbar a {
   color: var(--text-muted);
   text-decoration: none;
   padding: 0.45rem 0.7rem;
   border-radius: 8px;
   font-size: 0.95rem;
+  transition: color 0.18s ease, background 0.18s ease, transform 0.18s ease;
 }
 
 .navbar a:hover {
   color: var(--primary);
+  background: var(--bg);
+  transform: translateY(-1px);
 }
 
 .navbar a.active {
+  position: relative;
   color: var(--primary);
   background: var(--primary-soft);
   font-weight: 600;
+}
+
+.navbar a.active:hover {
+  transform: none;
+}
+
+/* Subrayado naranja que se despliega en la pestaña activa */
+.navbar a.active::after {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: 1px;
+  height: 2px;
+  background: var(--brand-orange);
+  border-radius: 2px;
+  transform-origin: left;
+  animation: barIn 0.35s cubic-bezier(0.2, 0.85, 0.25, 1) both;
 }
 
 .navbar .spacer {
@@ -313,6 +343,7 @@ button.btn-lg {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
+  transition: border-color 0.18s ease, box-shadow 0.22s ease, transform 0.18s ease;
 }
 
 .field input:hover,
@@ -323,8 +354,14 @@ button.btn-lg {
 .field input:focus,
 .field select:focus,
 .field textarea:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: -1px;
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(24, 86, 168, 0.16);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.field textarea:focus {
+  transform: none;
 }
 
 button {
@@ -513,10 +550,12 @@ th {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background:
-    radial-gradient(circle at 12% 18%, rgba(247, 148, 30, 0.10), transparent 32%),
-    radial-gradient(circle at 88% 82%, rgba(24, 86, 168, 0.12), transparent 38%),
-    var(--bg);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(247, 148, 30, 0.14), transparent 34%),
+    radial-gradient(circle at 88% 82%, rgba(24, 86, 168, 0.16), transparent 40%);
+  background-size: 180% 180%, 180% 180%;
+  animation: glowDrift 16s ease-in-out infinite;
 }
 
 .login-card {
@@ -528,12 +567,24 @@ th {
   border-radius: 14px;
   padding: 1.75rem;
   box-shadow: 0 10px 30px rgba(18, 63, 124, 0.10);
+  animation: cardIn 0.6s cubic-bezier(0.2, 0.85, 0.25, 1) both;
 }
 
 .login-brand {
   display: flex;
   justify-content: center;
   margin-bottom: 1.4rem;
+  animation: fadeUp 0.6s 0.12s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+/* Campos y botón del login entran escalonados */
+.login-card .field {
+  animation: fadeUp 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.login-card .field:nth-of-type(1) { animation-delay: 0.22s; }
+.login-card .field:nth-of-type(2) { animation-delay: 0.3s; }
+.login-card button.primary {
+  animation: fadeUp 0.5s 0.38s cubic-bezier(0.2, 0.85, 0.25, 1) both;
 }
 
 .spinner {
@@ -580,13 +631,14 @@ th {
   border-radius: 12px;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  transition: border-left-color 0.22s ease, box-shadow 0.25s ease,
+    transform 0.25s cubic-bezier(0.2, 0.85, 0.25, 1);
 }
 
 .tile:hover {
   border-left-color: var(--brand-orange);
-  box-shadow: 0 4px 14px rgba(18, 63, 124, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(18, 63, 124, 0.14);
+  transform: translateY(-3px);
 }
 
 .tile-title {
@@ -767,4 +819,206 @@ th {
   color: var(--primary);
   font-weight: 600;
   box-shadow: inset 0 -2px 0 var(--brand-orange);
+}
+
+/* ========================================================================
+   Animaciones (importadas del diseño "Centraliza Animado")
+   ======================================================================== */
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes itemIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  30%, 70% { transform: translateX(4px); }
+  50% { transform: translateX(-4px); }
+  0%, 100% { transform: none; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px) scaleY(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes barIn {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+@keyframes glowDrift {
+  0% { background-position: 0% 0%, 100% 100%; }
+  50% { background-position: 10% 8%, 88% 92%; }
+  100% { background-position: 0% 0%, 100% 100%; }
+}
+@keyframes sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(320%); }
+}
+@keyframes ring {
+  0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.35); }
+  100% { box-shadow: 0 0 0 16px rgba(5, 150, 105, 0); }
+}
+
+/* Encabezados e introducciones de página */
+.page > h1 {
+  animation: fadeUp 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.page > .muted,
+.guide-intro {
+  animation: fadeUp 0.5s 0.07s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+/* Tarjetas: entran de abajo, con un leve escalonado por posición */
+.card {
+  animation: cardIn 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.page > .card:nth-of-type(2) { animation-delay: 0.06s; }
+.page > .card:nth-of-type(3) { animation-delay: 0.12s; }
+.page > .card:nth-of-type(4) { animation-delay: 0.18s; }
+
+/* Inicio: panel del logo y logo flotante */
+.home-brand {
+  overflow: hidden;
+  animation: cardIn 0.55s 0.1s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.home-brand img {
+  animation: floatY 6s ease-in-out infinite;
+}
+
+/* Accesos del inicio, escalonados */
+.tile {
+  animation: cardIn 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.tile:nth-child(1) { animation-delay: 0.18s; }
+.tile:nth-child(2) { animation-delay: 0.26s; }
+.tile:nth-child(3) { animation-delay: 0.34s; }
+.tile:nth-child(4) { animation-delay: 0.42s; }
+.tile:nth-child(5) { animation-delay: 0.5s; }
+
+/* Badges de estado */
+.badge {
+  animation: pop 0.4s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.badge.PENDING {
+  animation: pulseSoft 1.6s ease-in-out infinite;
+}
+.badge.SENT {
+  animation: pop 0.4s cubic-bezier(0.2, 0.85, 0.25, 1) both,
+    ring 1.2s ease-out 0.2s;
+}
+
+/* Ítems del pedido entran al agregarse */
+.item-card {
+  animation: itemIn 0.35s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+/* Botón "Agregar ítem": realce naranja al pasar el mouse */
+.btn-add {
+  transition: background 0.18s ease, transform 0.16s ease, border-color 0.18s ease;
+}
+.btn-add:hover {
+  border-color: var(--brand-orange);
+  transform: translateY(-1px);
+}
+.btn-add:active {
+  transform: translateY(1px) scale(0.995);
+}
+
+/* Botón "Enviar pedido": destello que barre la superficie */
+button.btn-lg {
+  position: relative;
+  overflow: hidden;
+  transition: background 0.18s ease, transform 0.12s ease, box-shadow 0.2s ease;
+}
+button.btn-lg:hover:not(:disabled) {
+  box-shadow: 0 8px 20px rgba(18, 63, 124, 0.3);
+  transform: translateY(-1px);
+}
+button.btn-lg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  animation: sweep 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+button.btn-lg:disabled::after {
+  display: none;
+}
+
+/* Cajas de error tiemblan para llamar la atención */
+.error-box {
+  animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Modales y su fondo */
+.modal-backdrop {
+  animation: fadeIn 0.2s ease both;
+}
+.modal {
+  animation: modalIn 0.32s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+/* Desplegable de búsqueda */
+.searchable-select .options {
+  transform-origin: top;
+  animation: dropIn 0.2s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+
+/* Guía: pasos escalonados y número que reacciona al hover */
+.guide-step {
+  animation: fadeUp 0.5s cubic-bezier(0.2, 0.85, 0.25, 1) both;
+}
+.guide-step:nth-child(1) { animation-delay: 0.04s; }
+.guide-step:nth-child(2) { animation-delay: 0.1s; }
+.guide-step:nth-child(3) { animation-delay: 0.16s; }
+.guide-step:nth-child(4) { animation-delay: 0.22s; }
+.guide-step:nth-child(5) { animation-delay: 0.28s; }
+.step-num {
+  transition: transform 0.25s cubic-bezier(0.2, 0.85, 0.25, 1), background 0.25s ease;
+}
+.guide-step:hover .step-num {
+  transform: scale(1.12) rotate(-6deg);
+  background: var(--brand-orange);
+}
+
+/* Respetar la preferencia de menos movimiento del sistema */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
