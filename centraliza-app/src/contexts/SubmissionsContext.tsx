@@ -14,6 +14,7 @@ import {
   type FormType,
   type Submission,
 } from '../lib/local-db';
+import { notify } from '../lib/notifications';
 import { sendLog } from '../lib/send-log';
 import { useAuth } from './AuthContext';
 
@@ -158,16 +159,36 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
     const pending = await getPending();
     if (pending.length === 0) return;
     setSyncing(true);
+    let sent = 0;
+    let errored = 0;
     for (const sub of pending) {
       try {
         const payload = JSON.parse(sub.payload);
-        await attemptSend(user.token, sub.id, sub.form_type, payload, sub.company_label);
+        const outcome = await attemptSend(user.token, sub.id, sub.form_type, payload, sub.company_label);
+        if (outcome.result === 'sent') sent++;
+        else if (outcome.result === 'error') errored++;
       } catch {
         // payload corrupto — dejarlo como está
       }
     }
     await reload();
     setSyncing(false);
+
+    // Avisar por notificación local el resultado del reintento de pendientes.
+    if (sent > 0) {
+      notify(
+        'Pedidos enviados',
+        sent === 1 ? 'Se envió 1 pedido pendiente.' : `Se enviaron ${sent} pedidos pendientes.`
+      );
+    }
+    if (errored > 0) {
+      notify(
+        'Pedidos rechazados',
+        errored === 1
+          ? '1 pedido fue rechazado. Revisalo en Envíos.'
+          : `${errored} pedidos fueron rechazados. Revisalos en Envíos.`
+      );
+    }
   }
 
   async function syncOne(id: number, updatedPayload?: object): Promise<void> {

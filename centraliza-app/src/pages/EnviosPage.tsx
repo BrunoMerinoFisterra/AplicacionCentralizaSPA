@@ -1,9 +1,22 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { useSubmissions } from '../contexts/SubmissionsContext';
+import { API_BASE_URL } from '../lib/api';
 import type { Submission } from '../lib/local-db';
 
 const FORM_LABELS: Record<string, string> = {
   PEDIDO_COMPRA: 'Pedido de Compra',
+};
+
+// Registro de envío que devuelve el backend (GET /log/mine).
+// Refleja todo lo enviado desde cualquier dispositivo, no solo este.
+type ServerLog = {
+  id: number;
+  form_type: string;
+  company_label: string | null;
+  status: string; // 'SUCCESS' | 'ERROR'
+  error_detail: string | null;
+  created_at: string;
 };
 
 function formatDate(iso: string | null): string {
@@ -87,9 +100,41 @@ function ReviewModal({
 
 export function EnviosPage() {
   const { submissions, syncing, syncPending, syncOne, refresh } = useSubmissions();
+  const { user } = useAuth();
   const [reviewing, setReviewing] = useState<Submission | null>(null);
 
+  const [serverLogs, setServerLogs] = useState<ServerLog[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [logsError, setLogsError] = useState(false);
+
   const pendingCount = submissions.filter((s) => s.status === 'PENDING').length;
+
+  const loadServerLogs = useCallback(async () => {
+    if (!user?.token) return;
+    setLoadingLogs(true);
+    setLogsError(false);
+    try {
+      const res = await fetch(`${API_BASE_URL}/log/mine`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      if (!res.ok) throw new Error(`log/mine failed: ${res.status}`);
+      setServerLogs(await res.json());
+    } catch (err) {
+      console.error('Error loading server logs:', err);
+      setLogsError(true);
+    } finally {
+      setLoadingLogs(false);
+    }
+  }, [user?.token]);
+
+  useEffect(() => {
+    loadServerLogs();
+  }, [loadServerLogs]);
+
+  // Refresca ambas fuentes a la vez.
+  const refreshAll = async () => {
+    await Promise.all([refresh(), loadServerLogs()]);
+  };
 
   return (
     <div className="page">
@@ -100,7 +145,7 @@ export function EnviosPage() {
       </p>
 
       <div className="btn-row" style={{ marginBottom: '1rem' }}>
-        <button onClick={() => refresh()}>Actualizar</button>
+        <button onClick={refreshAll}>Actualizar</button>
         {pendingCount > 0 && (
           <button className="primary" onClick={() => syncPending()} disabled={syncing}>
             {syncing ? 'Sincronizando...' : `Reenviar pendientes (${pendingCount})`}
@@ -108,9 +153,10 @@ export function EnviosPage() {
         )}
       </div>
 
+      <h3 className="section-title">En este dispositivo</h3>
       {submissions.length === 0 && (
         <div className="card">
-          <p className="muted">Todavía no hay envíos.</p>
+          <p className="muted">Todavía no hay envíos en este dispositivo.</p>
         </div>
       )}
 
@@ -142,6 +188,53 @@ export function EnviosPage() {
           )}
         </div>
       ))}
+
+      <h3 className="section-title">Historial (todos los dispositivos)</h3>
+      <p className="muted" style={{ marginTop: 0 }}>
+        Registro de envíos guardado en el servidor. Incluye lo enviado desde cualquier dispositivo.
+        Los pendientes sin conexión no aparecen acá hasta que se envían.
+      </p>
+
+      {loadingLogs && <span className="spinner" />}
+
+      {logsError && (
+        <div className="error-box">
+          <div className="title">No se pudo cargar el historial del servidor.</div>
+          <div className="detail">
+            <button className="link" onClick={loadServerLogs}>
+              Reintentar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!loadingLogs && !logsError && serverLogs.length === 0 && (
+        <div className="card">
+          <p className="muted">Todavía no hay envíos registrados en el servidor.</p>
+        </div>
+      )}
+
+      {serverLogs.map((log) => {
+        const enviado = log.status === 'SUCCESS';
+        return (
+          <div key={log.id} className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <strong>{FORM_LABELS[log.form_type] ?? log.form_type}</strong>
+              <span className={`badge ${enviado ? 'SENT' : 'ERROR'}`}>
+                {enviado ? 'ENVIADO' : 'ERROR'}
+              </span>
+            </div>
+            <p className="muted" style={{ margin: '0.35rem 0' }}>
+              {log.company_label ?? 'Sin empresa'} · {formatDate(log.created_at)}
+            </p>
+            {!enviado && log.error_detail && (
+              <div className="error-box">
+                <div className="detail">{log.error_detail}</div>
+              </div>
+            )}
+          </div>
+        );
+      })}
 
       {reviewing && (
         <ReviewModal

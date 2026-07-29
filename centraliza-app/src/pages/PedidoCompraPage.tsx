@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { SearchableSelect, type SelectOption } from '../components/SearchableSelect';
@@ -98,6 +98,9 @@ export function PedidoCompraPage() {
           };
         })
         .filter((item) => item.label && item.value)
+        // Ocultar los productos marcados como no usar (ej. "** NO USAR ** ...").
+        // El reporte a medida ya los excluye; esto cubre el fallback Producto/list.
+        .filter((item) => !/\*+\s*no\s*usar/i.test(item.label))
         .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
       setProductoOptions(options);
       await setCached(cacheKey, options);
@@ -155,22 +158,48 @@ export function PedidoCompraPage() {
       setError({ title: 'Esta cuenta no tiene un tipo de documento asignado al workflow de compra. Contactá al administrador.' });
       return;
     }
+
+    // Validación de ítems antes de mostrar el resumen.
+    const itemsConProducto = items.filter((item) => item.ProductoCodigo);
+    if (itemsConProducto.length === 0) {
+      setError({ title: 'Agregá al menos un ítem con un producto seleccionado.' });
+      return;
+    }
+    const sinCantidad = itemsConProducto.some((item) => {
+      const cant = toNumberOrNull(item.Cantidad);
+      return cant === null || cant <= 0;
+    });
+    if (sinCantidad) {
+      setError({ title: 'Ingresá una cantidad mayor a 0 en todos los ítems con producto.' });
+      return;
+    }
+
+    setError(null);
     setConfirmVisible(true);
   };
 
+  // Evita que un doble-tap dispare dos envíos del mismo pedido.
+  const submittingRef = useRef(false);
+
   const submitCompra = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
-    const result = await addAndSubmit({
-      formType: 'PEDIDO_COMPRA',
-      payload: buildPayload(),
-      companyLabel: selectedCompany?.label ?? null,
-    });
-    setLoading(false);
-    if (result.status === 'error') {
-      setError({ title: result.title, detail: result.detail });
-    } else {
-      navigate('/envios');
+    try {
+      const result = await addAndSubmit({
+        formType: 'PEDIDO_COMPRA',
+        payload: buildPayload(),
+        companyLabel: selectedCompany?.label ?? null,
+      });
+      if (result.status === 'error') {
+        setError({ title: result.title, detail: result.detail });
+      } else {
+        navigate('/envios');
+      }
+    } finally {
+      setLoading(false);
+      submittingRef.current = false;
     }
   };
 
