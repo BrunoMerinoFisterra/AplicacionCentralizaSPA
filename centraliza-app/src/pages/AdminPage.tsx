@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SearchableSelect, type SelectOption } from '../components/SearchableSelect';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE_URL } from '../lib/api';
@@ -15,6 +15,14 @@ type AdminUser = {
   tipodoc_compra_nombre: string | null;
   created_at: string;
 };
+
+type SortKey =
+  | 'username'
+  | 'full_name'
+  | 'role'
+  | 'workflow_compra_nombre'
+  | 'tipodoc_compra_nombre'
+  | 'is_active';
 
 type LogRow = {
   id: number;
@@ -85,6 +93,62 @@ function UsersTab() {
     }
   };
 
+  // Búsqueda + orden por columna
+  const [search, setSearch] = useState('');
+  const [sortKey, setSortKey] = useState<SortKey>('username');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+
+  const visibleUsers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const filtered = q
+      ? users.filter((u) =>
+          [
+            u.username,
+            u.full_name,
+            u.role,
+            u.workflow_compra_nombre,
+            u.tipodoc_compra_nombre,
+            u.is_active ? 'activo' : 'inactivo',
+          ].some((v) => (v ?? '').toString().toLowerCase().includes(q))
+        )
+      : users;
+
+    const dir = sortDir === 'asc' ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      let av: string | number;
+      let bv: string | number;
+      if (sortKey === 'is_active') {
+        av = a.is_active ? 1 : 0;
+        bv = b.is_active ? 1 : 0;
+      } else {
+        av = (a[sortKey] ?? '').toString().toLowerCase();
+        bv = (b[sortKey] ?? '').toString().toLowerCase();
+      }
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+  }, [users, search, sortKey, sortDir]);
+
+  const th = (label: string, key: SortKey) => (
+    <th
+      className={`sortable${sortKey === key ? ' sorted' : ''}`}
+      onClick={() => toggleSort(key)}
+    >
+      {label}
+      <span className="sort-ind">{sortKey === key ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}</span>
+    </th>
+  );
+
   return (
     <>
       <div className="btn-row" style={{ marginBottom: '1rem' }}>
@@ -92,6 +156,13 @@ function UsersTab() {
           Nuevo usuario
         </button>
         <button onClick={load}>Actualizar</button>
+        <input
+          className="table-search"
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar usuario, nombre, rol..."
+        />
       </div>
 
       {error && (
@@ -107,28 +178,28 @@ function UsersTab() {
           <table>
             <thead>
               <tr>
-                <th>Usuario</th>
-                <th>Nombre</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Workflow compra</th>
-                <th>Tipo doc.</th>
+                {th('Usuario', 'username')}
+                {th('Nombre', 'full_name')}
+                {th('Rol', 'role')}
+                {th('Workflow compra', 'workflow_compra_nombre')}
+                {th('Tipo doc.', 'tipodoc_compra_nombre')}
+                {th('Estado', 'is_active')}
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {visibleUsers.map((u) => (
                 <tr key={u.id}>
                   <td>{u.username}</td>
                   <td>{u.full_name ?? '—'}</td>
                   <td>{u.role}</td>
+                  <td>{u.workflow_compra_nombre ?? '—'}</td>
+                  <td>{u.tipodoc_compra_nombre ?? '—'}</td>
                   <td>
                     <span className={`badge ${u.is_active ? 'SENT' : 'ERROR'}`}>
                       {u.is_active ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
-                  <td>{u.workflow_compra_nombre ?? '—'}</td>
-                  <td>{u.tipodoc_compra_nombre ?? '—'}</td>
                   <td>
                     <div className="btn-row" style={{ marginTop: 0 }}>
                       <button className="link" onClick={() => setEditing(u)}>
@@ -141,6 +212,13 @@ function UsersTab() {
                   </td>
                 </tr>
               ))}
+              {visibleUsers.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="muted" style={{ padding: '1rem 0.6rem' }}>
+                    No hay usuarios que coincidan con la búsqueda.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

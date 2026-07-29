@@ -542,6 +542,50 @@ th {
   white-space: nowrap;
 }
 
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+th.sortable:hover {
+  color: var(--primary);
+  background: var(--surface-2);
+}
+
+th.sortable.sorted {
+  color: var(--primary);
+}
+
+.sort-ind {
+  margin-left: 0.35rem;
+  font-size: 0.7rem;
+  opacity: 0.5;
+}
+
+th.sortable.sorted .sort-ind {
+  opacity: 1;
+  color: var(--brand-orange);
+}
+
+.table-search {
+  min-height: 40px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  min-width: 220px;
+  transition: border-color 0.18s ease, box-shadow 0.22s ease;
+}
+
+.table-search:focus {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(24, 86, 168, 0.16);
+  outline: none;
+}
+
 /* ---------- Login ---------- */
 
 .login-wrap {
