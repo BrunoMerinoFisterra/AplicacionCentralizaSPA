@@ -689,6 +689,31 @@ th.sortable.sorted .sort-ind {
   outline: none;
 }
 
+/* En teléfono vertical, la tabla de admin muestra solo lo esencial
+   (Usuario · Rol · Estado · acciones); el resto se ve en el escritorio. */
+@media (max-width: 640px) {
+  .col-hide-mobile {
+    display: none;
+  }
+
+  /* Compactar la tabla para que entre sin scroll horizontal */
+  .table-wrap.card {
+    padding: 0.5rem;
+  }
+
+  .table-wrap th,
+  .table-wrap td {
+    padding: 0.4rem 0.4rem;
+  }
+
+  /* Editar / Desactivar apilados: la columna de acciones queda angosta */
+  .table-wrap td .btn-row {
+    flex-direction: column;
+    gap: 0.15rem;
+    align-items: flex-start;
+  }
+}
+
 /* ---------- Login ---------- */
 
 .login-wrap {

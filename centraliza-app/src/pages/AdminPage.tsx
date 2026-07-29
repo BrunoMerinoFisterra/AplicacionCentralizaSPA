@@ -139,9 +139,9 @@ function UsersTab() {
     });
   }, [users, search, sortKey, sortDir]);
 
-  const th = (label: string, key: SortKey) => (
+  const th = (label: string, key: SortKey, extraClass = '') => (
     <th
-      className={`sortable${sortKey === key ? ' sorted' : ''}`}
+      className={`sortable${sortKey === key ? ' sorted' : ''}${extraClass ? ' ' + extraClass : ''}`}
       onClick={() => toggleSort(key)}
     >
       {label}
@@ -179,10 +179,10 @@ function UsersTab() {
             <thead>
               <tr>
                 {th('Usuario', 'username')}
-                {th('Nombre', 'full_name')}
+                {th('Nombre', 'full_name', 'col-hide-mobile')}
                 {th('Rol', 'role')}
-                {th('Workflow compra', 'workflow_compra_nombre')}
-                {th('Tipo doc.', 'tipodoc_compra_nombre')}
+                {th('Workflow compra', 'workflow_compra_nombre', 'col-hide-mobile')}
+                {th('Tipo doc.', 'tipodoc_compra_nombre', 'col-hide-mobile')}
                 {th('Estado', 'is_active')}
                 <th></th>
               </tr>
@@ -191,10 +191,10 @@ function UsersTab() {
               {visibleUsers.map((u) => (
                 <tr key={u.id}>
                   <td>{u.username}</td>
-                  <td>{u.full_name ?? '—'}</td>
+                  <td className="col-hide-mobile">{u.full_name ?? '—'}</td>
                   <td>{u.role}</td>
-                  <td>{u.workflow_compra_nombre ?? '—'}</td>
-                  <td>{u.tipodoc_compra_nombre ?? '—'}</td>
+                  <td className="col-hide-mobile">{u.workflow_compra_nombre ?? '—'}</td>
+                  <td className="col-hide-mobile">{u.tipodoc_compra_nombre ?? '—'}</td>
                   <td>
                     <span className={`badge ${u.is_active ? 'SENT' : 'ERROR'}`}>
                       {u.is_active ? 'Activo' : 'Inactivo'}
