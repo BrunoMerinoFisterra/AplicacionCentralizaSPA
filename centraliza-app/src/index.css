@@ -74,6 +74,8 @@ h1, h2, h3 {
   align-items: center;
   gap: 0.25rem;
   padding: 0.5rem 1rem;
+  /* En apps nativas el webview dibuja debajo de la barra de estado del celu */
+  padding-top: calc(0.5rem + env(safe-area-inset-top));
   background: var(--surface);
   border-bottom: 2px solid var(--brand-blue);
   position: sticky;
