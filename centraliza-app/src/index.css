@@ -1196,3 +1196,84 @@ button.btn-lg:disabled::after {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* ---------- Envíos: tarjeta clickeable con detalle desplegable ---------- */
+
+.submission-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.submission-toggle:hover strong {
+  color: var(--brand-blue);
+}
+
+.submission-toggle::after {
+  content: '▾';
+  display: inline-block;
+  margin-left: 0.4rem;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.submission-toggle[aria-expanded='true']::after {
+  transform: rotate(-180deg);
+}
+
+/* ---------- Resumen legible de un pedido (reemplaza el JSON crudo) ---------- */
+
+.pedido-resumen {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.pedido-resumen-datos {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.75rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.92rem;
+}
+
+.pedido-resumen-datos dt {
+  color: var(--text-muted);
+}
+
+.pedido-resumen-datos dd {
+  margin: 0;
+}
+
+.pedido-resumen-items-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+.pedido-resumen-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.4rem;
+}
+
+.pedido-resumen-item-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+}
+
+.pedido-resumen-item-detail {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+}

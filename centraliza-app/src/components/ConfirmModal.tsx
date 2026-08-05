@@ -1,19 +1,20 @@
+import type { ReactNode } from 'react';
+
 type Props = {
   visible: boolean;
   title: string;
-  payload?: object | null;
+  children?: ReactNode;
   onCancel: () => void;
   onConfirm: () => void;
   confirmText?: string;
   cancelText?: string;
 };
 
-// Modal de confirmación previa al envío, con vista del payload
-// (port de components/SendConfirmationModal.tsx de FSTrack).
+// Modal de confirmación previa al envío.
 export function ConfirmModal({
   visible,
   title,
-  payload,
+  children,
   onCancel,
   onConfirm,
   confirmText = 'Confirmar',
@@ -25,12 +26,7 @@ export function ConfirmModal({
     <div className="modal-backdrop" onClick={onCancel}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
-        {payload != null && (
-          <>
-            <p className="muted">Se enviará la siguiente información:</p>
-            <pre>{JSON.stringify(payload, null, 2)}</pre>
-          </>
-        )}
+        {children}
         <div className="btn-row">
           <button className="primary" onClick={onConfirm}>
             {confirmText}

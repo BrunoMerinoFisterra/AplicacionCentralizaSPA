@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { PedidoResumen } from '../components/PedidoResumen';
 import { SearchableSelect, type SelectOption } from '../components/SearchableSelect';
 import { useAuth } from '../contexts/AuthContext';
 import { useCompany } from '../contexts/CompanyContext';
@@ -122,6 +123,9 @@ export function PedidoCompraPage() {
   const updateItem = (index: number, field: keyof CompraItem, value: string) => {
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
+
+  const productoLabel = (codigo: string) =>
+    productoOptions.find((p) => p.value === codigo)?.label || codigo;
 
   const addItem = () => setItems((prev) => [...prev, createEmptyItem()]);
 
@@ -330,13 +334,27 @@ export function PedidoCompraPage() {
       <ConfirmModal
         visible={confirmVisible}
         title="¿Enviar el pedido?"
-        payload={confirmVisible ? buildPayload() : null}
         onCancel={() => setConfirmVisible(false)}
         onConfirm={async () => {
           setConfirmVisible(false);
           await submitCompra();
         }}
-      />
+      >
+        <p className="muted">Se va a enviar este pedido:</p>
+        <PedidoResumen
+          empresa={selectedCompany?.label ?? null}
+          fecha={fecha}
+          descripcion={descripcion}
+          items={items
+            .filter((item) => item.ProductoCodigo)
+            .map((item) => ({
+              producto: productoLabel(item.ProductoCodigo),
+              cantidad: item.Cantidad,
+              fechaProximoPaso: item.FechaProximoPaso,
+              descripcion: item.Descripcion,
+            }))}
+        />
+      </ConfirmModal>
     </div>
   );
 }

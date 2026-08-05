@@ -1,8 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
+import { PedidoResumen } from '../components/PedidoResumen';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubmissions } from '../contexts/SubmissionsContext';
 import { API_BASE_URL } from '../lib/api';
 import type { Submission } from '../lib/local-db';
+
+// Payload de PEDIDO_COMPRA tal como se guarda/envía (ver buildPayload en PedidoCompraPage).
+type PedidoCompraPayload = {
+  Fecha?: string;
+  Descripcion?: string;
+  Items?: Array<{
+    ProductoCodigo?: string;
+    Cantidad?: number | string;
+    Descripcion?: string;
+    FechaProximoPaso?: string;
+  }>;
+};
+
+function parsePedidoPayload(raw: string): PedidoCompraPayload | null {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
 
 const FORM_LABELS: Record<string, string> = {
   PEDIDO_COMPRA: 'Pedido de Compra',
@@ -102,6 +123,7 @@ export function EnviosPage() {
   const { submissions, syncing, syncPending, syncOne, refresh } = useSubmissions();
   const { user } = useAuth();
   const [reviewing, setReviewing] = useState<Submission | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const [serverLogs, setServerLogs] = useState<ServerLog[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
@@ -160,34 +182,63 @@ export function EnviosPage() {
         </div>
       )}
 
-      {submissions.map((sub) => (
-        <div key={sub.id} className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <strong>
-              {FORM_LABELS[sub.form_type] ?? sub.form_type} #{sub.id}
-            </strong>
-            <span className={`badge ${sub.status}`}>{sub.status}</span>
-          </div>
-          <p className="muted" style={{ margin: '0.35rem 0' }}>
-            {sub.company_label ?? 'Sin empresa'} · Creado: {formatDate(sub.created_at)}
-            {sub.sent_at ? ` · Enviado: ${formatDate(sub.sent_at)}` : ''}
-          </p>
-          {sub.status === 'ERROR' && (
-            <>
-              {sub.error_detail && (
-                <div className="error-box">
-                  <div className="detail">{sub.error_detail}</div>
-                </div>
-              )}
-              <div className="btn-row">
-                <button className="primary" onClick={() => setReviewing(sub)}>
-                  Revisar y reenviar
-                </button>
+      {submissions.map((sub) => {
+        const expanded = expandedId === sub.id;
+        const pedido = expanded ? parsePedidoPayload(sub.payload) : null;
+        return (
+          <div key={sub.id} className="card">
+            <button
+              className="submission-toggle"
+              onClick={() => setExpandedId(expanded ? null : sub.id)}
+              aria-expanded={expanded}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap', width: '100%' }}>
+                <strong>
+                  {FORM_LABELS[sub.form_type] ?? sub.form_type} #{sub.id}
+                </strong>
+                <span className={`badge ${sub.status}`}>{sub.status}</span>
               </div>
-            </>
-          )}
-        </div>
-      ))}
+            </button>
+            <p className="muted" style={{ margin: '0.35rem 0' }}>
+              {sub.company_label ?? 'Sin empresa'} · Creado: {formatDate(sub.created_at)}
+              {sub.sent_at ? ` · Enviado: ${formatDate(sub.sent_at)}` : ''}
+            </p>
+
+            {expanded && (
+              pedido ? (
+                <PedidoResumen
+                  empresa={sub.company_label}
+                  fecha={pedido.Fecha ?? null}
+                  descripcion={pedido.Descripcion ?? null}
+                  items={(pedido.Items ?? []).map((item) => ({
+                    producto: item.ProductoCodigo ?? '',
+                    cantidad: item.Cantidad ?? null,
+                    fechaProximoPaso: item.FechaProximoPaso ?? null,
+                    descripcion: item.Descripcion ?? null,
+                  }))}
+                />
+              ) : (
+                <p className="muted">No se pudo leer el detalle de este pedido.</p>
+              )
+            )}
+
+            {sub.status === 'ERROR' && (
+              <>
+                {sub.error_detail && (
+                  <div className="error-box">
+                    <div className="detail">{sub.error_detail}</div>
+                  </div>
+                )}
+                <div className="btn-row">
+                  <button className="primary" onClick={() => setReviewing(sub)}>
+                    Revisar y reenviar
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        );
+      })}
 
       <h3 className="section-title">Historial (todos los dispositivos)</h3>
       <p className="muted" style={{ marginTop: 0 }}>
