@@ -133,6 +133,14 @@ export function PedidoCompraPage() {
     setItems((prev) => (prev.length === 1 ? prev : prev.filter((_, i) => i !== index)));
   };
 
+  // Antepone el nombre de quien carga el pedido a la descripción, para no
+  // depender de que cada usuario lo escriba a mano (fuente: cuenta logueada).
+  const buildDescripcion = () => {
+    const nombre = user?.fullName || user?.username || '';
+    const lineas = [nombre, descripcion].filter(Boolean);
+    return lineas.length ? lineas.map((l) => `* ${l}`).join('\n') : null;
+  };
+
   const buildPayload = () =>
     cleanObject({
       WorkflowCodigo: workflow.compra?.codigo || null,
@@ -140,7 +148,7 @@ export function PedidoCompraPage() {
       EmpresaCodigo: selectedCompany?.value || null,
       TransaccionSubtipoCodigo: workflow.compra?.subtipoCodigo || null,
       TransaccionTipoCodigo: 'OPER',
-      Descripcion: descripcion || null,
+      Descripcion: buildDescripcion(),
       Items: items.map((item) => ({
         ProductoCodigo: item.ProductoCodigo || null,
         Cantidad: toNumberOrNull(item.Cantidad),
@@ -344,7 +352,7 @@ export function PedidoCompraPage() {
         <PedidoResumen
           empresa={selectedCompany?.label ?? null}
           fecha={fecha}
-          descripcion={descripcion}
+          descripcion={buildDescripcion()}
           items={items
             .filter((item) => item.ProductoCodigo)
             .map((item) => ({

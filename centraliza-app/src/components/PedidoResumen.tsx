@@ -33,7 +33,7 @@ export function PedidoResumen({ empresa, fecha, descripcion, items }: Props) {
         {descripcion && (
           <>
             <dt>Descripción</dt>
-            <dd>{descripcion}</dd>
+            <dd style={{ whiteSpace: 'pre-line' }}>{descripcion}</dd>
           </>
         )}
       </dl>
