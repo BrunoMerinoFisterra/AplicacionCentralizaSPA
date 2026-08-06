@@ -135,10 +135,11 @@ export function PedidoCompraPage() {
 
   // Antepone el nombre de quien carga el pedido a la descripción, para no
   // depender de que cada usuario lo escriba a mano (fuente: cuenta logueada).
+  // Separador " - " en vez de salto de línea: Finnegans descarta los \n sueltos.
   const buildDescripcion = () => {
     const nombre = user?.fullName || user?.username || '';
     const lineas = [nombre, descripcion].filter(Boolean);
-    return lineas.length ? lineas.join('\r\n') : null;
+    return lineas.length ? lineas.join(' - ') : null;
   };
 
   const buildPayload = () =>
