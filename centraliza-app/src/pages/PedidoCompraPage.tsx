@@ -297,7 +297,7 @@ export function PedidoCompraPage() {
                 />
               </div>
               <div className="field narrow">
-                <label>Fecha próximo paso</label>
+                <label>Fecha de entrega</label>
                 <input
                   type="date"
                   value={item.FechaProximoPaso}

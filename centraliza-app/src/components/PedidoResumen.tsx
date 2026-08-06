@@ -47,7 +47,7 @@ export function PedidoResumen({ empresa, fecha, descripcion, items }: Props) {
           </div>
           {(item.fechaProximoPaso || item.descripcion) && (
             <p className="muted pedido-resumen-item-detail">
-              {item.fechaProximoPaso && <>Próximo paso: {item.fechaProximoPaso}</>}
+              {item.fechaProximoPaso && <>Fecha de entrega: {item.fechaProximoPaso}</>}
               {item.fechaProximoPaso && item.descripcion && ' · '}
               {item.descripcion}
             </p>
