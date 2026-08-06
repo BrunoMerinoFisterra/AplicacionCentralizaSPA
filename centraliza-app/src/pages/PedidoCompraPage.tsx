@@ -138,7 +138,7 @@ export function PedidoCompraPage() {
   const buildDescripcion = () => {
     const nombre = user?.fullName || user?.username || '';
     const lineas = [nombre, descripcion].filter(Boolean);
-    return lineas.length ? lineas.join('\n') : null;
+    return lineas.length ? lineas.join('\r\n') : null;
   };
 
   const buildPayload = () =>
