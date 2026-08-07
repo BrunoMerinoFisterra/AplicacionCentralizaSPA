@@ -361,6 +361,11 @@ h1, h2, h3 {
   border-radius: 10px;
   padding: 0.9rem;
   margin-bottom: 0.75rem;
+  /* La animación de entrada (itemIn) crea un stacking context aislado;
+     sin esto el dropdown de producto queda atrapado detrás del botón
+     "Enviar pedido", que viene después en el DOM. */
+  position: relative;
+  z-index: 1;
 }
 
 .item-card-header {
