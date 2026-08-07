@@ -4,26 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSubmissions } from '../contexts/SubmissionsContext';
 import { API_BASE_URL } from '../lib/api';
 import type { Submission } from '../lib/local-db';
-
-// Payload de PEDIDO_COMPRA tal como se guarda/envía (ver buildPayload en PedidoCompraPage).
-type PedidoCompraPayload = {
-  Fecha?: string;
-  Descripcion?: string;
-  Items?: Array<{
-    ProductoCodigo?: string;
-    Cantidad?: number | string;
-    Descripcion?: string;
-    FechaProximoPaso?: string;
-  }>;
-};
-
-function parsePedidoPayload(raw: string): PedidoCompraPayload | null {
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
+import { parsePedidoPayload } from '../lib/pedido-compra';
+import { loadProductoOptions } from '../lib/productos';
 
 const FORM_LABELS: Record<string, string> = {
   PEDIDO_COMPRA: 'Pedido de Compra',
@@ -129,6 +111,21 @@ export function EnviosPage() {
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [logsError, setLogsError] = useState(false);
 
+  // Códigoproducto -> nombre, para mostrar el detalle de pedidos ya enviados
+  // con el mismo nombre legible que se ve antes de enviar (no solo el código).
+  const [productoLabels, setProductoLabels] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!user?.token) return;
+    loadProductoOptions(user.token)
+      .then((options) => {
+        setProductoLabels(Object.fromEntries(options.map((o) => [o.value, o.label])));
+      })
+      .catch((err) => console.error('Error loading productos:', err));
+  }, [user?.token]);
+
+  const productoLabel = (codigo: string) => productoLabels[codigo] || codigo;
+
   const pendingCount = submissions.filter((s) => s.status === 'PENDING').length;
 
   const loadServerLogs = useCallback(async () => {
@@ -211,7 +208,7 @@ export function EnviosPage() {
                   fecha={pedido.Fecha ?? null}
                   descripcion={pedido.Descripcion ?? null}
                   items={(pedido.Items ?? []).map((item) => ({
-                    producto: item.ProductoCodigo ?? '',
+                    producto: item.ProductoCodigo ? productoLabel(item.ProductoCodigo) : '',
                     cantidad: item.Cantidad ?? null,
                     fechaProximoPaso: item.FechaProximoPaso ?? null,
                     descripcion: item.Descripcion ?? null,

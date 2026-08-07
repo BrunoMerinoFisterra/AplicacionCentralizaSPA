@@ -9,8 +9,7 @@ import { useSubmissions } from '../contexts/SubmissionsContext';
 import { useWorkflow } from '../contexts/WorkflowContext';
 import type { ApiError } from '../lib/api-error';
 import { cleanObject, getTodayDate, toNumberOrNull } from '../lib/form-utils';
-import { getFinnegansToken } from '../lib/get-finnegans-token';
-import { getCached, setCached } from '../lib/options-cache';
+import { loadProductoOptions } from '../lib/productos';
 
 type CompraItem = {
   ProductoCodigo: string;
@@ -55,56 +54,9 @@ export function PedidoCompraPage() {
 
   const loadProductos = async () => {
     if (!user?.token) return;
-    const cacheKey = 'productos_compra';
-    const cached = await getCached<SelectOption[]>(cacheKey);
-    if (cached) {
-      setProductoOptions(cached);
-      return;
-    }
     setLoadingProductos(true);
     try {
-      const token = await getFinnegansToken(user.token);
-
-      // 1) Reporte a medida (SP que filtra activos + comprables del lado del servidor).
-      //    No existe en todas las instancias de Finnegans — si falla, se usa la API estándar.
-      let data: unknown[] | null = null;
-      const reportRes = await fetch(
-        `https://api.finneg.com/api/reports/PRODUCTOSCOMPRAAPI?ACCESS_TOKEN=${token}`
-      ).catch(() => null);
-      if (reportRes?.ok) {
-        const parsed = await reportRes.json();
-        if (Array.isArray(parsed)) data = parsed;
-      }
-
-      // 2) Fallback: API estándar Producto/list (filtra solo activos; trae todos los productos).
-      if (!data) {
-        const listRes = await fetch(`https://api.finneg.com/api/Producto/list?ACCESS_TOKEN=${token}`);
-        if (!listRes.ok) throw new Error(`Producto/list request failed: ${listRes.status}`);
-        const parsed = await listRes.json();
-        data = (Array.isArray(parsed) ? parsed : []).filter((item: Record<string, unknown>) => {
-          const activo = item.activo ?? item.ACTIVO ?? item.Activo;
-          return activo === true || activo === 'true' || activo === 1 || activo === '1';
-        });
-      }
-
-      const options: SelectOption[] = data
-        .map((raw) => {
-          const item = raw as Record<string, unknown>;
-          return {
-            label: String(
-              item.NOMBRE ?? item.Nombre ?? item.nombre ?? item.DESCRIPCION ?? item.descripcion ??
-              item.CODIGO ?? item.Codigo ?? item.codigo ?? ''
-            ).trim(),
-            value: String(item.CODIGO ?? item.Codigo ?? item.codigo ?? '').trim(),
-          };
-        })
-        .filter((item) => item.label && item.value)
-        // Ocultar los productos marcados como no usar (ej. "** NO USAR ** ...").
-        // El reporte a medida ya los excluye; esto cubre el fallback Producto/list.
-        .filter((item) => !/\*+\s*no\s*usar/i.test(item.label))
-        .sort((a, b) => a.label.localeCompare(b.label, 'es', { sensitivity: 'base' }));
-      setProductoOptions(options);
-      await setCached(cacheKey, options);
+      setProductoOptions(await loadProductoOptions(user.token));
     } catch (err) {
       console.error('Error loading productos:', err);
     } finally {
