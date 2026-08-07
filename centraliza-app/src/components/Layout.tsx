@@ -48,15 +48,9 @@ export function Layout() {
               Administración
             </NavLink>
           )}
-          {/* Las dos guías van juntas al final: el admin ve ambas */}
           <NavLink to="/guia" onClick={closeMenu}>
             Guía
           </NavLink>
-          {isAdmin && (
-            <NavLink to="/guia-admin" onClick={closeMenu}>
-              Guía Admin
-            </NavLink>
-          )}
           <span className="spacer" />
           <span className="user-chip">{user?.fullName || user?.username}</span>
           <button className="link" onClick={handleSignOut}>

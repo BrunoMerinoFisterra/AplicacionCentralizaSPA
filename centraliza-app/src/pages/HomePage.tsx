@@ -51,16 +51,10 @@ export function HomePage() {
         </Link>
 
         {isAdmin && (
-          <>
-            <Link className="tile" to="/admin">
-              <span className="tile-title">Administración</span>
-              <span className="tile-desc">Gestionar usuarios y revisar logs</span>
-            </Link>
-            <Link className="tile" to="/guia-admin">
-              <span className="tile-title">Guía del administrador</span>
-              <span className="tile-desc">Cómo usar el panel de administración</span>
-            </Link>
-          </>
+          <Link className="tile" to="/admin">
+            <span className="tile-title">Administración</span>
+            <span className="tile-desc">Gestionar usuarios y revisar logs</span>
+          </Link>
         )}
       </div>
     </div>
