@@ -11,8 +11,110 @@ export function GuiaPage() {
     <div className="page">
       <h1>Guía de uso</h1>
       <p className="guide-intro">
-        Cómo cargar un pedido de compra y enviarlo a Finnegans, paso a paso.
+        Cómo instalar la app en Android, cargar un pedido de compra y enviarlo a Finnegans.
       </p>
+
+      <section className="card" aria-labelledby="instalacion-apk">
+        <h2 className="section-title" id="instalacion-apk">Instalar en Android con APK</h2>
+        <p className="muted">
+          El APK es el archivo que instala Centraliza en tu celular Android. Antes de empezar,
+          tené a mano el archivo o enlace que te compartió el administrador, conexión a internet
+          y tu usuario y contraseña. En iPhone, usá la versión web: el APK es solo para Android.
+        </p>
+
+        <GuideStep num={1} title="Descargar el APK en el celular">
+          <p>
+            Abrí el archivo o enlace que te envió el administrador y descargá el archivo terminado
+            en <strong>.apk</strong>. Esperá a que termine la descarga. Si todavía no lo recibiste,
+            pedíselo al administrador.
+          </p>
+        </GuideStep>
+
+        <GuideStep num={2} title="Abrir el archivo descargado">
+          <p>
+            Tocá la notificación de descarga o buscá el APK en <strong>Archivos → Descargas</strong>
+            {' '}del celular. Según el equipo, la aplicación puede llamarse <strong>Mis archivos</strong>.
+          </p>
+        </GuideStep>
+
+        <GuideStep num={3} title="Permitir la instalación si Android lo solicita">
+          <p>
+            Si aparece un aviso de que esa fuente no puede instalar aplicaciones, tocá
+            {' '}<strong>Configuración</strong> o <strong>Ajustes</strong> y activá
+            {' '}<strong>Permitir desde esta fuente</strong> para la aplicación desde la que abriste
+            el APK, por ejemplo Chrome o Archivos. Después volvé al instalador; si se cerró,
+            abrí el APK de nuevo.
+          </p>
+          <p>
+            Los nombres de las opciones varían según el celular y la versión de Android. Si
+            necesitás buscar el permiso, buscá <strong>Instalar aplicaciones desconocidas</strong>
+            {' '}en Ajustes.
+          </p>
+        </GuideStep>
+
+        <GuideStep num={4} title="Instalar y abrir Centraliza">
+          <p>
+            Tocá <strong>Instalar</strong> y esperá a que termine. Luego tocá <strong>Abrir</strong>
+            {' '}o buscá <strong>Centraliza SPA App</strong> entre las aplicaciones del celular.
+          </p>
+          <p>
+            Al terminar, podés volver al mismo ajuste y desactivar <strong>Permitir desde esta fuente</strong>.
+            Centraliza seguirá instalada.
+          </p>
+        </GuideStep>
+
+        <GuideStep num={5} title="Ingresar con tu cuenta">
+          <p>
+            Con internet, ingresá con el usuario y la contraseña que te dio el administrador.
+            Si ya usás Centraliza en la web, son los mismos. Cuando veas la pantalla de
+            {' '}<strong>Inicio</strong>, la instalación está lista.
+          </p>
+          <p>
+            Si tu cuenta no tiene empresas habilitadas, pedile al administrador que la configure
+            antes de cargar tu primer pedido.
+          </p>
+        </GuideStep>
+
+        <details className="step-body">
+          <summary><strong>Actualizar una versión instalada</strong></summary>
+          <p>
+            Abrí <strong>Envíos</strong> en la app instalada y resolvé los pedidos pendientes o con
+            error antes de actualizar. Después descargá el nuevo APK que te envíe el administrador,
+            abrilo y confirmá <strong>Actualizar</strong> o <strong>Instalar</strong>, según el aviso
+            de Android.
+          </p>
+          <p>
+            <strong>No desinstales la app ni borres sus datos para actualizar:</strong> podrías
+            perder los pedidos guardados en ese dispositivo. Si Android rechaza la actualización,
+            consultá al administrador con el mensaje que aparece.
+          </p>
+        </details>
+
+        <details className="step-body">
+          <summary><strong>Si no podés instalar el APK</strong></summary>
+          <ul>
+            <li>
+              <strong>No encontrás el archivo:</strong> revisá Descargas en el navegador o en
+              Archivos y verificá que la descarga haya terminado.
+            </li>
+            <li>
+              <strong>“App no instalada” o archivo no válido:</strong> verificá que haya espacio
+              disponible y descargá el APK de nuevo desde el enlace del administrador. Si sigue
+              fallando, compartile el mensaje y el modelo del celular.
+            </li>
+            <li>
+              <strong>Bloqueo de Play Protect, desarrollador no verificado o equipo administrado:</strong>
+              {' '}consultá al administrador para que verifique el APK y cómo instalarlo en tu equipo.
+            </li>
+          </ul>
+          <p>
+            Más ayuda sobre el permiso de instalación en la{' '}
+            <a href="https://support.google.com/pixelphone/answer/7391672?hl=es" target="_blank" rel="noopener noreferrer">
+              guía oficial de Google
+            </a>.
+          </p>
+        </details>
+      </section>
 
       <div className="card">
         <h3 className="section-title">Cargar un pedido de compra</h3>
@@ -122,6 +224,12 @@ export function GuiaPage() {
           <strong>Si un pedido quedó en ERROR:</strong> tocá <strong>Revisar y reenviar</strong>.
           Se abre el detalle con el mensaje de Finnegans y podés corregir los datos antes de
           intentarlo otra vez. No crees un pedido nuevo: podrías duplicarlo.
+        </div>
+        <div className="note info">
+          Si ya no necesitás un pedido con error, tocá <strong>Eliminar del historial</strong> y
+          confirmá. Se borra de este dispositivo y no podrás recuperarlo ni reenviarlo desde acá.
+          El registro del servidor se conserva y no se modifica ningún pedido en Finnegans.
+          Esta opción solo aparece para pedidos en estado <strong>ERROR</strong>.
         </div>
       </div>
 

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Centraliza · Guía de instalación en Android</title>
+  <style>
+    :root { color-scheme: light; --ink: #162c43; --muted: #526477; --line: #dae2e9; --accent: #f6a340; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f0f4f7; color: var(--ink); font: 16px/1.65 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { max-width: 780px; margin: 32px auto; padding: 0 20px; }
+    header { padding: 36px; border-radius: 24px 24px 0 0; background: #162c43; color: #fff; border-top: 6px solid var(--accent); }
+    .brand { margin: 0 0 28px; font-size: 15px; font-weight: 800; letter-spacing: .16em; }
+    .eyebrow { margin: 0 0 8px; color: #ffc378; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(28px, 6vw, 40px); line-height: 1.18; letter-spacing: -.025em; }
+    header p:last-child { margin: 18px 0 0; color: #d9e4ee; max-width: 540px; }
+    .content { padding: 32px 36px; background: #fff; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 24px 24px; }
+    h2 { font-size: 22px; line-height: 1.3; margin: 0 0 16px; }
+    h3 { font-size: 18px; line-height: 1.4; margin: 0 0 8px; }
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+    .muted, .step p { color: var(--muted); }
+    strong { color: var(--ink); }
+    .checklist { padding: 20px 24px; margin-bottom: 30px; background: #f0f5f9; border-radius: 14px; }
+    .checklist h2 { font-size: 18px; margin-bottom: 10px; }
+    ul { padding-left: 22px; margin: 8px 0 12px; }
+    li { margin: 6px 0; }
+    .steps { padding: 0; margin: 0; list-style: none; counter-reset: install; }
+    .step { position: relative; padding: 0 0 24px 54px; margin: 0 0 24px; border-bottom: 1px solid var(--line); counter-increment: install; }
+    .step::before { content: counter(install); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: white; font-size: 16px; font-weight: 750; }
+    .step:last-child { margin-bottom: 0; }
+    .setting { display: block; padding: 10px 14px; margin: 12px 0; background: #f0f5f9; border-left: 3px solid #427da6; border-radius: 0 8px 8px 0; font-weight: 650; }
+    .success { padding: 16px 20px; margin-top: 4px; border-radius: 12px; background: #eaf5ef; color: #24543b; }
+    .success strong { color: inherit; }
+    section + section { margin-top: 32px; }
+    .warning { background: #fff4e5; border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 0 12px 12px 0; margin-top: 16px; }
+    .faq { padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .faq:last-child { border-bottom: 0; padding-bottom: 0; }
+    .faq h3 { font-size: 16px; }
+    .faq p { color: var(--muted); }
+    a { color: #205f90; text-underline-offset: 3px; overflow-wrap: anywhere; }
+    a:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    footer { padding: 22px 12px; font-size: 13px; text-align: center; color: var(--muted); }
+    @media (max-width: 520px) {
+      main { margin: 0 auto; padding: 0; }
+      header { border-radius: 0; padding: 28px 22px; }
+      .content { border-radius: 0; border-left: 0; border-right: 0; padding: 26px 22px; }
+      .brand { margin-bottom: 22px; }
+      .step { padding-left: 46px; }
+      .step::before { width: 32px; height: 32px; }
+      .checklist { padding: 18px; }
+    }
+    @media print {
+      body { background: white; font-size: 11pt; }
+      main { max-width: none; margin: 0; padding: 0; }
+      header { padding: 20px; background: white; color: var(--ink); border-radius: 0; }
+      header p:last-child, .eyebrow { color: var(--muted); }
+      .brand { margin-bottom: 14px; }
+      .content { padding: 20px; border: 0; }
+      .step, .checklist, .warning, .faq { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .step::before { color: var(--ink); background: white; border: 1px solid var(--ink); }
+      footer { padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="brand">CENTRALIZA</p>
+      <p class="eyebrow">Guía de instalación · Android</p>
+      <h1>Instalá la app<br>en tu celular.</h1>
+      <p>Cinco pasos para instalar Centraliza con el archivo APK que te comparte el administrador.</p>
+    </header>
+
+    <div class="content">
+      <aside class="checklist" aria-labelledby="antes-de-empezar">
+        <h2 id="antes-de-empezar">Antes de empezar</h2>
+        <ul>
+          <li>Un celular <strong>Android</strong> con conexión a internet.</li>
+          <li>El archivo <strong>.apk</strong> o su enlace, enviado por el administrador.</li>
+          <li>Tu <strong>usuario y contraseña</strong> de Centraliza.</li>
+        </ul>
+        <p class="muted">El APK es el archivo que instala la app. Esta guía no incluye el instalador: si no lo recibiste, pedíselo al administrador. En iPhone, usá la versión web.</p>
+      </aside>
+
+      <section aria-labelledby="instalacion">
+        <h2 id="instalacion">Instalación paso a paso</h2>
+        <ol class="steps">
+          <li class="step">
+            <h3>Descargá el APK</h3>
+            <p>Abrí en tu celular el archivo o enlace que te compartió el administrador. Descargá el archivo terminado en <strong>.apk</strong> y esperá a que finalice la descarga.</p>
+          </li>
+          <li class="step">
+            <h3>Abrí el archivo descargado</h3>
+            <p>Tocá la notificación de descarga o buscá el APK en <strong>Archivos → Descargas</strong>. En algunos celulares, la aplicación se llama <strong>Mis archivos</strong>.</p>
+          </li>
+          <li class="step">
+            <h3>Habilitá el permiso si Android lo solicita</h3>
+            <p>Si Android indica que esa fuente no puede instalar aplicaciones, tocá <strong>Configuración</strong> o <strong>Ajustes</strong> y activá:</p>
+            <span class="setting">Permitir desde esta fuente</span>
+            <p>El permiso corresponde a la aplicación desde la que abriste el APK, por ejemplo Chrome o Archivos. Volvé al instalador; si se cerró, abrí el APK otra vez.</p>
+            <p>Los nombres pueden variar según el celular. Para encontrar el permiso, buscá <strong>Instalar aplicaciones desconocidas</strong> en Ajustes.</p>
+          </li>
+          <li class="step">
+            <h3>Instalá y abrí Centraliza</h3>
+            <p>Tocá <strong>Instalar</strong> y esperá a que termine. Después tocá <strong>Abrir</strong> o buscá <strong>Centraliza SPA App</strong> entre tus aplicaciones.</p>
+            <p>Al finalizar, podés desactivar <strong>Permitir desde esta fuente</strong> en el mismo ajuste. Centraliza seguirá instalada.</p>
+          </li>
+          <li class="step">
+            <h3>Ingresá con tu cuenta</h3>
+            <p>Con internet, escribí el <strong>usuario y la contraseña</strong> que te dio el administrador. Si ya usás la versión web, son los mismos.</p>
+            <p>Si no tenés empresas habilitadas, pedile al administrador que configure tu cuenta antes de cargar pedidos.</p>
+          </li>
+        </ol>
+        <div class="success"><strong>¡Listo!</strong> Cuando veas la pantalla de Inicio, la instalación está completa. En el menú Guía encontrás cómo cargar tu primer pedido.</div>
+      </section>
+
+      <section aria-labelledby="actualizacion">
+        <h2 id="actualizacion">¿Ya tenés la app instalada?</h2>
+        <p>Antes de actualizar, abrí <strong>Envíos</strong> en la app instalada y resolvé los pedidos pendientes o con error.</p>
+        <p>Descargá el nuevo APK del administrador, abrilo y confirmá <strong>Actualizar</strong> o <strong>Instalar</strong>, según el aviso de Android.</p>
+        <div class="warning"><strong>No desinstales la app ni borres sus datos para actualizar.</strong> Podrías perder los pedidos guardados en ese dispositivo. Si la actualización falla, consultá al administrador con el mensaje que aparece.</div>
+      </section>
+
+      <section aria-labelledby="ayuda">
+        <h2 id="ayuda">Si algo no funciona</h2>
+        <div class="faq">
+          <h3>No encuentro el APK</h3>
+          <p>Revisá Descargas en el navegador o en Archivos y verificá que la descarga haya terminado.</p>
+        </div>
+        <div class="faq">
+          <h3>Aparece “App no instalada” o “Archivo no válido”</h3>
+          <p>Verificá que haya espacio disponible y descargá el APK de nuevo desde el enlace del administrador. Si sigue fallando, compartile el mensaje y el modelo del celular.</p>
+        </div>
+        <div class="faq">
+          <h3>Play Protect o el equipo bloquean la instalación</h3>
+          <p>Si aparece un bloqueo de Play Protect, un aviso de desarrollador no verificado o una restricción del equipo, consultá al administrador para que verifique el APK y cómo instalarlo en tu celular.</p>
+        </div>
+        <div class="faq">
+          <h3>La app abre, pero no puedo ingresar</h3>
+          <p>Verificá la conexión a internet y tus credenciales. Si no recordás la contraseña o la cuenta está inactiva, pedile ayuda al administrador.</p>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>Centraliza · Guía para usuarios</p>
+      <p>Ayuda adicional: <a href="https://support.google.com/pixelphone/answer/7391672?hl=es" target="_blank" rel="noopener noreferrer">permisos de instalación en Android — Google</a>.</p>
+    </footer>
+  </main>
+</body>
+</html>

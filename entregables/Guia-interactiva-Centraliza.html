@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Centraliza · Instalación y costos en Android e iOS</title>
+<style>
+:root{color-scheme:light;--ink:#173047;--muted:#526477;--line:#d8e2ea;--orange:#f6a340;--blue:#20668f}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:#eef3f6;color:var(--ink);font:16px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:960px;margin:28px auto;padding:0 20px}
+header{padding:36px 38px;color:#fff;background:var(--ink);border-top:6px solid var(--orange);border-radius:22px 22px 0 0}
+.brand{font-size:14px;font-weight:800;letter-spacing:.17em;margin:0 0 24px}.eyebrow{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#ffd092;font-weight:750}
+h1{font-size:clamp(29px,6vw,43px);line-height:1.15;letter-spacing:-.025em;margin:0 0 14px;max-width:650px}header .intro{color:#dce6ed;margin:0;max-width:680px}.meta{margin:20px 0 0;font-size:12px;color:#c5d4df}
+.content{padding:30px 38px;background:#fff;border:1px solid var(--line);border-top:0;border-radius:0 0 22px 22px}
+h2{margin:0 0 12px;font-size:23px;line-height:1.3}h3{margin:0 0 10px;font-size:18px;line-height:1.4}p{margin:0 0 13px}p:last-child{margin-bottom:0}section+section{margin-top:30px}
+.muted,.small{color:var(--muted)}.small{font-size:13px}.label{color:var(--blue);font-weight:750;font-size:12px;text-transform:uppercase;letter-spacing:.07em;margin:0 0 8px}
+a{color:#175d8d;text-underline-offset:3px;overflow-wrap:anywhere}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--orange);outline-offset:4px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.choice{text-align:left;border:2px solid var(--line);background:#fff;padding:18px;border-radius:13px;color:var(--ink);min-height:88px}.choice strong,.choice span{display:block}.choice strong{font-size:19px}.choice span{color:var(--muted);font-size:13px;margin-top:4px}.choice[aria-pressed="true"]{border-color:var(--blue);background:#edf5fa;box-shadow:inset 0 0 0 1px var(--blue)}.choices .choice strong{font-size:16px}.choice:hover{border-color:var(--blue)}
+.notice{padding:15px 18px;border-radius:11px;background:#f1f5f8;margin:16px 0;font-size:14px}.warning{border-left:4px solid var(--orange);background:#fff5e7}.success{background:#eaf5ed;border-left:4px solid #37855d}
+.route{padding:24px;border:1px solid var(--line);border-radius:16px;margin-top:20px}.route-top{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-start}.badge{padding:4px 10px;font-size:12px;font-weight:700;border-radius:20px;background:#edf3f7}
+.wizard{margin:20px 0;padding:22px;background:#f4f7fa;border-radius:12px}.wizard h3{font-size:21px}progress{display:block;width:100%;height:7px;margin:10px 0 22px;accent-color:var(--blue)}.step-meta{display:flex;gap:12px;justify-content:space-between;font-size:12px;font-weight:750;color:var(--blue)}
+.actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:22px}.btn{min-height:44px;border:1px solid var(--line);padding:9px 16px;border-radius:9px;background:#fff;color:var(--ink);font-weight:650}.primary{background:var(--ink);border-color:var(--ink);color:#fff}.btn:disabled{opacity:.45;cursor:default}
+details{border-top:1px solid var(--line);padding:15px 0}details:last-child{padding-bottom:0}summary{cursor:pointer;font-weight:700;min-height:30px}details>div{padding-top:12px}ul,ol{padding-left:23px;margin:10px 0 16px}li{margin:8px 0}.divider{padding-top:30px;border-top:1px solid var(--line)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:18px 0}table{border-collapse:collapse;width:100%;font-size:14px}caption{text-align:left;padding:12px 15px;font-weight:700;background:#f4f7fa}th,td{text-align:left;padding:13px 15px;border-top:1px solid var(--line);vertical-align:top}th{font-size:12px;color:var(--muted)}td strong{white-space:nowrap}
+.calculator{padding:20px;background:#f0f5f9;border-radius:13px}fieldset{border:0;padding:0;margin:0 0 16px}legend{font-weight:700;margin-bottom:10px}.check{display:inline-flex;align-items:center;gap:9px;margin:0 20px 10px 0;min-height:36px}input[type=checkbox]{width:19px;height:19px;accent-color:var(--blue)}input[type=range]{width:100%;accent-color:var(--blue);margin:12px 0}.total{display:block;font-size:34px;font-weight:800;letter-spacing:-.02em;margin:12px 0 3px}.sources{font-size:13px}footer{text-align:center;font-size:12px;padding:20px 10px;color:var(--muted)}
+@media(max-width:620px){main{padding:0;margin:0}header{border-radius:0;padding:28px 22px}.content{padding:24px 20px;border-radius:0;border-left:0;border-right:0}.choices{grid-template-columns:1fr;gap:8px}.choices .choice{min-height:0;padding:13px 15px}.grid .choice{padding:15px}.route,.wizard{padding:18px}th,td{padding:10px}.total{font-size:29px}}
+@media print{body{background:#fff;font-size:11pt}main{max-width:none;margin:0;padding:0}header{background:#fff;color:var(--ink);padding:20px;border-radius:0}header .intro,.eyebrow,.meta{color:var(--muted)}.content{border:0;padding:20px}#navigator,.wizard,.calculator,.open-help{display:none!important}#print-steps{display:block!important}details>div{display:block!important}.notice,tr{break-inside:avoid}h2,h3{break-after:avoid}.table-wrap{overflow:visible}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<p class="brand">CENTRALIZA</p><p class="eyebrow">Guía interactiva · Android + iPhone</p>
+<h1>Elegí cómo instalar.<br>Entendé qué cuesta publicar.</h1>
+<p class="intro">Recorré las opciones para tu celular y compará lo que necesita la empresa para distribuir una app por primera vez.</p>
+<p class="meta">Información consultada el 14 de septiembre de 2026 · Importes de referencia en USD</p>
+</header>
+<div class="content">
+<p class="small open-help">Para usar los botones, abrí este HTML en un navegador con JavaScript. Algunos visores de archivos de WhatsApp no ejecutan la parte interactiva; en iPhone puede ser necesario recibir esta guía como enlace web.</p>
+<noscript><style>#navigator,.calculator{display:none}</style><div class="notice">
+<h2>Guía rápida para este visor</h2><p>Este visor no ejecuta la parte interactiva. Los costos y las explicaciones siguen disponibles más abajo.</p>
+<p><strong>Android:</strong> descargá el APK del administrador, abrilo en Archivos → Descargas, autorizá la fuente si Android lo solicita, tocá Instalar e ingresá con tu cuenta. No desinstales para actualizar: podrías perder pedidos locales.</p>
+<p><strong>iPhone:</strong> el APK no funciona. Abrí la dirección web de Centraliza en Safari y usá Compartir → Agregar a pantalla de inicio. Para una app nativa necesitás un enlace publicado en App Store o una invitación vigente de TestFlight.</p>
+</div></noscript>
+<section id="navigator" aria-labelledby="platform-title">
+<p class="label">01 · Tu dispositivo</p><h2 id="platform-title">¿Qué celular usás?</h2>
+<div class="grid" role="group" aria-label="Sistema operativo">
+<button type="button" class="choice" data-platform="android" aria-pressed="false"><strong>Android</strong><span>APK, Google Play o navegador</span></button>
+<button type="button" class="choice" data-platform="ios" aria-pressed="false"><strong>iPhone / iOS</strong><span>Web, TestFlight o App Store</span></button>
+</div>
+<div id="methods" hidden><p id="platform-note" class="notice"></p><h3>Elegí el recorrido</h3><div id="method-buttons" class="choices" role="group" aria-label="Forma de instalación"></div></div>
+</section>
+<section id="route" class="route" aria-labelledby="route-title" hidden>
+<div class="route-top"><p class="label" id="route-label"></p><span class="badge" id="route-badge"></span></div>
+<h2 id="route-title" tabindex="-1"></h2><p id="route-intro" class="muted"></p><div id="route-prereq" class="notice"></div>
+<div class="wizard"><div class="step-meta"><span id="step-count"></span><span>Instalación guiada</span></div>
+<progress id="step-progress" value="1" max="5" aria-label="Avance del recorrido"></progress>
+<div id="step-content" aria-live="polite" aria-atomic="true"></div>
+<div class="actions"><button type="button" id="previous" class="btn">Anterior</button><button type="button" id="next" class="btn primary">Siguiente</button></div>
+<p id="complete" class="notice success" hidden>Recorrido completado. Para confirmar la instalación, abrí Centraliza e ingresá con tu cuenta.</p></div>
+<ol id="print-steps" hidden></ol>
+<details open><summary>Qué implica esta opción</summary><div id="route-tradeoff"></div></details>
+<details><summary>Actualizar o resolver un problema</summary><div id="route-help"></div></details>
+</section>
+<section class="divider" id="costos" aria-labelledby="cost-title">
+<p class="label">02 · Para quien publica la app</p><h2 id="cost-title">La cuenta de la tienda es solo una parte del costo</h2>
+<p>Estos importes los paga <strong>la persona o empresa que publica</strong>, no cada empleado que instala Centraliza. Son tarifas de cuenta: no se multiplican por usuario ni se cobran nuevamente por cada app publicada.</p>
+<div class="table-wrap"><table><caption>Tarifas base de las cuentas de publicación</caption>
+<thead><tr><th scope="col">Canal</th><th scope="col">Primer año</th><th scope="col">Años siguientes</th></tr></thead>
+<tbody>
+<tr><th scope="row">Google Play</th><td><strong>USD 25</strong><br>Alta única</td><td>Sin renovación anual de esa cuenta. <a href="https://support.google.com/googleplay/android-developer/answer/6112435?hl=en" target="_blank" rel="noopener noreferrer">Google</a></td></tr>
+<tr><th scope="row">App Store / TestFlight</th><td><strong>USD 99</strong><br>Membresía anual</td><td><strong>USD 99 / año</strong><br>Apple Developer Program. <a href="https://developer.apple.com/programs/enroll/" target="_blank" rel="noopener noreferrer">Apple</a></td></tr>
+<tr><th scope="row">Ambas tiendas</th><td><strong>USD 124</strong></td><td><strong>USD 99 / año</strong><br>Suma de las tarifas anteriores.</td></tr>
+</tbody></table></div>
+<p class="small">Valores base en USD, antes de impuestos, conversión de moneda y cargos del medio de pago. Apple puede mostrar precios locales. Existen exenciones para ciertas entidades; esta comparación usa las tarifas estándar.</p>
+<div class="calculator" aria-labelledby="calculator-title"><h3 id="calculator-title">Calculá las cuentas de tienda</h3>
+<fieldset><legend>¿Dónde querés publicar?</legend><label class="check"><input id="google-account" type="checkbox" checked>Google Play</label><label class="check"><input id="apple-account" type="checkbox" checked>App Store / TestFlight</label></fieldset>
+<label for="years">Período: <strong><span id="years-label">1</span> <span id="years-unit">año</span></strong></label><input id="years" type="range" min="1" max="5" step="1" value="1">
+<output id="cost-total" class="total" for="google-account apple-account years" aria-live="polite">USD 124</output>
+<p id="cost-breakdown" class="small">USD 25 de alta en Google + USD 99 × 1 año en Apple.</p>
+<p class="small">Solo estima estas dos cuentas, manteniendo las tarifas actuales. No incluye verificación de APK fuera de Play, desarrollo, infraestructura ni impuestos.</p></div>
+<details open><summary>Otros costos de lanzar y mantener Centraliza</summary><div><ul>
+<li><strong>Preparar la app:</strong> adaptación, pruebas en equipos reales, correcciones, iconos, capturas y ficha de tienda.</li>
+<li><strong>En iOS:</strong> acceso a macOS con Xcode para este proyecto Capacitor, firma y pruebas en iPhone. Puede ser equipo propio o infraestructura de compilación; no hay un precio único. <a href="https://capacitorjs.com/docs/ios" target="_blank" rel="noopener noreferrer">Capacitor iOS</a></li>
+<li><strong>Operación:</strong> alojamiento de la web y API, Azure SQL, dominio si se usa, soporte y mantenimiento. Publicar en una tienda no paga estos servicios.</li>
+<li><strong>Gestión de publicación:</strong> identidad de la empresa, política de privacidad, declaraciones de datos y acceso de prueba para la revisión. Pagar la cuenta no garantiza la aprobación.</li>
+</ul><p class="small">El trabajo y los servicios se presupuestan aparte según el alcance. El simulador no representa el costo total del proyecto.</p></div></details>
+<details><summary>Google Play: qué exige el primer lanzamiento</summary><div>
+<p>Además del alta, se verifica la identidad y se prepara la app para revisión. Para <strong>cuentas personales creadas después del 13/11/2023</strong>, Google exige una prueba cerrada con al menos <strong>12 participantes durante 14 días consecutivos</strong> antes de solicitar acceso a producción. Cumplir el plazo no publica la app automáticamente. <a href="https://support.google.com/googleplay/android-developer/answer/14151465?hl=en" target="_blank" rel="noopener noreferrer">Requisitos oficiales</a></p>
+<p>Las cuentas de organización siguen su propio proceso de verificación. Elegí el tipo que corresponda al titular real del proyecto.</p></div></details>
+</section>
+<section class="divider" aria-labelledby="apk-title"><p class="label">03 · La ventaja de Android</p><h2 id="apk-title">Podés entregar un APK sin publicar en Google Play</h2>
+<p>El administrador puede compartir el instalador firmado por archivo o enlace. Eso evita pasar por la publicación en Play, pero deja a cargo del equipo las actualizaciones, la distribución y la asistencia cuando Android muestra avisos.</p>
+<div class="notice warning"><strong>No significa “sin costos ni requisitos para siempre”.</strong> No necesitás pagar una cuenta de Google Play solo para entregar un APK. La verificación de desarrolladores fuera de Play es un proceso diferente.</div>
+<details><summary>Qué cambia con la verificación de Android en 2026–2027</summary><div>
+<p>Google anuncia el inicio el <strong>30/09/2026</strong> para tiendas participantes en Brasil, Indonesia, Singapur y Tailandia, en equipos certificados. La expansión global está prevista desde 2027. Según su FAQ, el APK instalado directamente no queda incluido en esa primera etapa de septiembre. <a href="https://developer.android.com/developer-verification" target="_blank" rel="noopener noreferrer">Calendario oficial</a></p>
+<p>Para distribución amplia fuera de Play, Google informa una tarifa de <strong>USD 25</strong> para la cuenta Full Distribution de Android Developer Console. Si ya usás Play Console, podés gestionar allí la verificación de apps distribuidas fuera de Play; no presupuestes ambas cuentas automáticamente.</p>
+<p>También existe una cuenta limitada gratuita para estudiantes y aficionados, de hasta <strong>20 dispositivos</strong>; no debe asumirse como solución de distribución empresarial. <a href="https://developer.android.com/developer-verification/guides/faq" target="_blank" rel="noopener noreferrer">Cuentas, costos y excepciones</a></p>
+</div></details></section>
+<section class="divider" aria-labelledby="ios-title"><p class="label">04 · Por qué cambia en iPhone</p><h2 id="ios-title">Un APK no se puede instalar en iOS</h2>
+<p>Hace falta una versión preparada para iPhone y un canal de distribución habilitado. Enviar un archivo de iOS por WhatsApp no equivale a abrir e instalar un APK de Android.</p>
+<details open><summary>App Store: membresía, firma y revisión</summary><div>
+<p>La app nativa requiere preparación y firma para iOS, una membresía activa y revisión de Apple. Para una cuenta de organización se valida la entidad y, en general, su número D-U-N-S. <a href="https://developer.apple.com/programs/enroll/" target="_blank" rel="noopener noreferrer">Inscripción de Apple</a></p>
+<p>También se evalúan privacidad, funcionamiento y contenido. Una app que solo envuelve una web puede tener problemas con el requisito de funcionalidad mínima; usar Capacitor no garantiza ni impide por sí solo la aprobación. <a href="https://developer.apple.com/app-store/review/guidelines/#minimum-functionality" target="_blank" rel="noopener noreferrer">Criterio 4.2 de Apple</a></p></div></details>
+<details><summary>TestFlight: útil para probar, con vencimiento</summary><div>
+<p>El usuario instala TestFlight y acepta una invitación. Cada versión dura <strong>hasta 90 días desde su carga</strong>; vencida, deja de abrir. El equipo debe subir otra versión para continuar. <a href="https://testflight.apple.com/" target="_blank" rel="noopener noreferrer">Guía de TestFlight</a></p>
+<p>Se incluye en Apple Developer Program. Las pruebas externas pasan por revisión; es un canal beta que necesita mantenimiento, no una instalación permanente como solución final. <a href="https://developer.apple.com/testflight/" target="_blank" rel="noopener noreferrer">Pruebas externas</a></p></div></details>
+<details><summary>Distribución privada: tampoco es un APK para cualquiera</summary><div><ul>
+<li><strong>Custom Apps:</strong> distribución a organizaciones específicas mediante Apple Business, con revisión. Puede encajar en una app interna; requiere preparar la organización y su distribución. <a href="https://support.apple.com/en-ae/guide/business/axm58ba3112a/web" target="_blank" rel="noopener noreferrer">Apple Business</a></li>
+<li><strong>Ad Hoc:</strong> instala en dispositivos previamente registrados, con un límite de 100 por familia de producto y año de membresía. Agrega gestión de dispositivos y firma. <a href="https://developer.apple.com/help/account/devices/devices-overview" target="_blank" rel="noopener noreferrer">Dispositivos registrados</a></li>
+<li><strong>Enterprise:</strong> USD 299 por año, para organizaciones elegibles de 100 o más empleados y uso interno específico, sujeto a evaluación. No es una forma de repartir la app a cualquier cliente. <a href="https://developer.apple.com/programs/enterprise/" target="_blank" rel="noopener noreferrer">Requisitos Enterprise</a></li>
+</ul></div></details>
+<details><summary>¿Y las tiendas alternativas de iOS?</summary><div>
+<p>Apple contempla distribución alternativa en Brasil, Japón y la Unión Europea, con diferencias según región, dispositivo y versión. Exige elegibilidad y sus propios procesos; no es instalación universal de archivos. Argentina no figura en esa lista al momento de esta guía. <a href="https://support.apple.com/en-ie/118110" target="_blank" rel="noopener noreferrer">Disponibilidad regional</a></p></div></details>
+<div class="notice success"><strong>Para Centraliza hoy:</strong> el proyecto revisado incluye web y Android. La versión nativa de iOS todavía debe prepararse y validarse. En iPhone, el camino inicial es la web; agregarla al inicio no garantiza las mismas funciones offline o notificaciones que la app Android.</div>
+</section>
+<section class="divider sources" aria-labelledby="sources-title"><h2 id="sources-title">Sobre esta guía</h2>
+<p>Las tarifas y condiciones están enlazadas a las fuentes oficiales junto a cada explicación. Consultadas el <strong>14/09/2026</strong>; verificá cambios antes de pagar o publicar. Esta guía no contiene un APK, una invitación de TestFlight ni enlaces de Centraliza publicados en tiendas: el administrador debe compartir el acceso correspondiente.</p>
+<p>El contenido y los controles funcionan sin conexiones externas en un navegador compatible. Los enlaces a las fuentes sí requieren internet. El recorrido solo orienta: no instala aplicaciones ni contrata cuentas.</p>
+</section>
+</div><footer>Centraliza · Guía de instalación y distribución</footer>
+</main>
+<script>
+'use strict';
+const routes = {
+apk:{label:'Android · APK',title:'Instalar desde el archivo del administrador',badge:'Sin publicar en Play',intro:'La opción directa para distribuir Centraliza en Android a un grupo conocido.',prereq:'Necesitás el APK firmado del administrador, conexión para descargarlo y tus credenciales. Este HTML no incluye el instalador.',steps:[
+['Descargá el APK','Abrí el archivo o enlace del administrador y esperá a que termine la descarga del archivo <strong>.apk</strong>.'],
+['Abrí el archivo','Tocá la notificación de descarga o buscá el APK en <strong>Archivos → Descargas</strong>. En algunos equipos se llama Mis archivos.'],
+['Autorizá la fuente si se solicita','Si Android lo pide, entrá a <strong>Ajustes</strong> y activá <strong>Permitir desde esta fuente</strong> para la aplicación que abrió el APK, como Chrome o Archivos. Volvé al instalador. Los nombres cambian según el equipo.'],
+['Instalá Centraliza','Tocá <strong>Instalar</strong>, esperá y elegí <strong>Abrir</strong>. Luego podés quitar el permiso a esa fuente; Centraliza seguirá instalada.'],
+['Ingresá con tu cuenta','Abrí <strong>Centraliza SPA App</strong> con internet e ingresá con tu usuario y contraseña. Cuando veas Inicio, está lista. Si no tenés empresas habilitadas, consultá al administrador.']],
+tradeoff:'<p><strong>Ventaja:</strong> compartir sin completar una publicación en Google Play. <strong>Trabajo adicional:</strong> distribuir cada actualización y acompañar los avisos de instalación.</p><p>No hay una tarifa de tienda por cada instalación del APK. Sí hay costos de desarrollo y operación y requisitos de verificación a considerar; revisá la sección de Android más abajo.</p><p class="small"><a href="https://support.google.com/pixelphone/answer/7391672?hl=es" target="_blank" rel="noopener noreferrer">Ayuda de instalación de Google</a></p>',
+help:'<p>Antes de actualizar, resolvé los pedidos pendientes o con error en <strong>Envíos</strong>. Abrí el nuevo APK y confirmá la actualización. <strong>No desinstales ni borres los datos:</strong> podrías perder pedidos locales.</p><p>Si falla, comprobá espacio y descarga completa. Si hay un bloqueo de Play Protect o del equipo, pedile al administrador que verifique el archivo y el mensaje. Las actualizaciones deben conservar una firma compatible.</p>'},
+play:{label:'Android · Google Play',title:'Instalar desde Google Play',badge:'Requiere publicación previa',intro:'La instalación y las actualizaciones se gestionan desde la tienda, una vez que la app esté disponible.',prereq:'Pedile al administrador el enlace de la ficha de Centraliza. Tener un proyecto Android no significa que ya esté publicado en Google Play.',steps:[
+['Recibí el enlace oficial','Pedile al administrador el enlace de Centraliza en <strong>Google Play</strong>. Si todavía no existe una publicación, elegí el recorrido APK o web.'],
+['Revisá la ficha','Abrí el enlace con Google Play y comprobá que el nombre y el desarrollador coincidan con los indicados por el administrador.'],
+['Instalá e ingresá','Tocá <strong>Instalar</strong>, abrí Centraliza y usá tu usuario y contraseña. Si no está disponible para tu cuenta o equipo, consultá al administrador.']],
+tradeoff:'<p>La empresa paga <strong>USD 25 una sola vez</strong> por el alta de Google Play. También debe preparar la ficha, verificar identidad, probar y pasar la revisión. La tarifa no se cobra por empleado.</p><p>Más abajo se explican los requisitos de pruebas para cuentas personales nuevas y los costos fuera del alta.</p>',
+help:'<p>Actualizá desde Google Play. Si no aparece la app, verificá el enlace y si está limitada a ciertos usuarios o países.</p><p>Si ya tenías el APK, consultá antes de cambiar de canal: una incompatibilidad de firma puede impedir actualizar sobre la instalación existente. No desinstales con pedidos locales sin resolver.</p>'},
+androidweb:{label:'Android · Web',title:'Usar Centraliza desde el navegador',badge:'Sin instalar un APK',intro:'Accedé a la versión web desde el enlace del administrador.',prereq:'Necesitás la dirección web de Centraliza, conexión a internet y una cuenta habilitada.',steps:[
+['Abrí el enlace de Centraliza','Usá el enlace web del administrador. Este archivo es la guía, no la aplicación.'],
+['Ingresá con tu cuenta','Escribí tu usuario y contraseña en la web. Si falla la conexión, verificá internet o consultá al administrador.'],
+['Guardá el acceso','Podés guardar la página como favorita. Resolvé los pedidos pendientes antes de borrar datos del navegador.']],
+tradeoff:'<p>No requiere cuenta de tienda para distribuir el acceso web. El alojamiento, la API y el mantenimiento siguen teniendo su propio costo.</p><p>La web guarda pedidos localmente, pero no se debe asumir que podrá abrirse desde cero sin internet ni que tendrá las funciones nativas de Android.</p>',
+help:'<p>Pedile al administrador la dirección correcta si el enlace no abre. No borres datos del navegador mientras haya pedidos pendientes: se guardan localmente en ese navegador.</p>'},
+iosweb:{label:'iPhone · Web',title:'Abrir Centraliza y agregarla al inicio',badge:'Camino inicial para iPhone',intro:'Usá la web desde Safari. Podés crear un acceso en Inicio sin publicar en App Store.',prereq:'Necesitás la dirección web de Centraliza y tu cuenta. El APK de Android no se puede instalar en iPhone.',steps:[
+['Abrí Centraliza en Safari','Pedile al administrador el enlace web y abrilo en <strong>Safari</strong>. No agregues este archivo de guía como si fuera la app.'],
+['Abrí el menú Compartir','Tocá <strong>Compartir</strong> en Safari. Según el diseño de la barra, puede estar dentro del menú de más opciones.'],
+['Agregá el acceso al inicio','Elegí <strong>Agregar a pantalla de inicio</strong>. Si aparece, activá <strong>Abrir como app web</strong> y tocá Agregar. Si no ves la opción, revisá Editar acciones.'],
+['Abrí el acceso e ingresá','Buscá el icono en Inicio, abrilo con internet e ingresá con tu cuenta. Es la versión web; puede pedirte iniciar sesión otra vez.']],
+tradeoff:'<p><strong>Sin tarifa de App Store por esta vía.</strong> Sigue siendo una web y requiere alojamiento. No se convierte en una app nativa por tener un icono.</p><p>En Centraliza no está validada la equivalencia con Android en apertura offline o notificaciones. Usá conexión y resolvé los pendientes antes de borrar datos del sitio.</p><p class="small"><a href="https://support.apple.com/en-gb/guide/iphone/iphea86e5236/ios" target="_blank" rel="noopener noreferrer">Instrucciones de Safari de Apple</a></p>',
+help:'<p>Si abriste el enlace dentro de otra aplicación, abrilo en Safari para encontrar Compartir. Si no carga, verificá internet y la dirección con el administrador.</p><p>El acceso de Inicio puede usar una sesión distinta a la del navegador. No borres los datos del sitio como primer intento de solución si tenés pedidos pendientes.</p>'},
+testflight:{label:'iPhone · TestFlight',title:'Instalar una versión de prueba',badge:'Beta · Hasta 90 días por versión',intro:'Sirve para validar una futura versión nativa de iPhone con usuarios invitados.',prereq:'El equipo debe preparar la app iOS y enviarte una invitación vigente. El proyecto revisado todavía no incluye esa versión nativa lista para distribuir.',steps:[
+['Instalá TestFlight','Buscá <strong>TestFlight de Apple</strong> en App Store e instalalo en un iPhone compatible.'],
+['Aceptá la invitación','Abrí el enlace o correo del administrador. Aceptá la invitación en TestFlight; la beta debe tener cupo y una versión compatible.'],
+['Instalá la beta de Centraliza','Tocá <strong>Instalar</strong> dentro de TestFlight. Abrí Centraliza e ingresá con tu cuenta.'],
+['Revisá la vigencia','Cada versión vence hasta 90 días después de que el desarrollador la sube. Actualizá cuando el equipo publique otra. Si vence, pedile una nueva versión al administrador.']],
+tradeoff:'<p>La membresía estándar del desarrollador es <strong>USD 99 al año</strong>; TestFlight forma parte del programa. Los usuarios de prueba no necesitan pagar esa membresía.</p><p>Las pruebas externas requieren revisión. Al vencer una versión ya no abre: exige que el equipo mantenga las betas actualizadas.</p>',
+help:'<p>Una invitación puede estar cerrada, completa o no tener versión compatible. Si la beta expiró, hace falta una nueva carga del equipo: descargar la misma versión no extiende el plazo.</p><p>Antes de cambiar de versión o canal, resolvé tus pedidos pendientes.</p>'},
+appstore:{label:'iPhone · App Store',title:'Instalar la versión publicada',badge:'Requiere preparación y aprobación',intro:'Una vez aprobada y distribuida por Apple, el usuario instala desde la ficha de la app.',prereq:'Necesitás el enlace de Centraliza del administrador. Esta guía explica el canal; no confirma que exista una publicación actual.',steps:[
+['Recibí el enlace de App Store','Pedile al administrador el enlace oficial de Centraliza. Si no hay versión publicada para tu región, usá el recorrido web.'],
+['Verificá e instalá','Abrí la ficha, comprobá el desarrollador y confirmá la descarga según lo que muestre App Store. No necesitás una cuenta Apple Developer para instalar como usuario.'],
+['Abrí Centraliza','Ingresá con tus credenciales y verificá tus empresas habilitadas. Las actualizaciones se gestionan por App Store.']],
+tradeoff:'<p>Para publicar, la membresía estándar cuesta <strong>USD 99 cada año</strong>. Se suman preparación para iOS, pruebas y revisión. No es un pago por usuario.</p><p>Si la app es solo para una organización, evaluá distribución privada con Custom Apps. La publicación pública no es el único canal de Apple.</p>',
+help:'<p>Si no está disponible en tu país o sigue en revisión, consultá al administrador. Pagar la membresía no hace que la app aparezca de inmediato.</p><p>No desinstales con pedidos pendientes para intentar actualizar.</p>'}
+};
+const platforms={
+android:{note:'Android permite instalar un APK compartido por el administrador. También podés usar la web o Google Play si ya existe una publicación.',methods:[['apk','Tengo un APK','Instalación directa'],['play','Google Play','Con enlace de la tienda'],['androidweb','Versión web','Desde el navegador']]},
+ios:{note:'En iPhone, el APK no funciona. Para Centraliza, empezá por la web; TestFlight y App Store requieren que el equipo prepare y distribuya la versión iOS.',methods:[['iosweb','Usar la web','Acceso desde Safari'],['testflight','TestFlight','Con invitación de prueba'],['appstore','App Store','Con enlace publicado']]}
+};
+let activeRoute=null,stepIndex=0;
+const byId=id=>document.getElementById(id);
+function renderStep(){
+const route=routes[activeRoute],step=route.steps[stepIndex];
+byId('step-count').textContent=`Paso ${stepIndex+1} de ${route.steps.length}`;
+byId('step-progress').max=route.steps.length;byId('step-progress').value=stepIndex+1;
+byId('step-content').innerHTML=`<h3>${step[0]}</h3><p>${step[1]}</p>`;
+byId('previous').disabled=stepIndex===0;
+byId('next').textContent=stepIndex===route.steps.length-1?'Terminar recorrido':'Siguiente';
+byId('next').disabled=false;byId('complete').hidden=true;
+}
+function selectRoute(key,focus=true){
+activeRoute=key;stepIndex=0;const route=routes[key];
+document.querySelectorAll('[data-route]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.route===key)));
+byId('route').hidden=false;
+for(const field of ['label','title','badge','intro','prereq'])byId('route-'+field).textContent=route[field];
+byId('route-tradeoff').innerHTML=route.tradeoff;byId('route-help').innerHTML=route.help;
+byId('print-steps').innerHTML=route.steps.map(step=>`<li><strong>${step[0]}</strong><p>${step[1]}</p></li>`).join('');
+renderStep();if(focus)byId('route-title').focus({preventScroll:true});
+}
+document.querySelectorAll('[data-platform]').forEach(button=>button.addEventListener('click',()=>{
+const platform=platforms[button.dataset.platform];
+document.querySelectorAll('[data-platform]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+byId('methods').hidden=false;byId('platform-note').textContent=platform.note;byId('method-buttons').replaceChildren();
+platform.methods.forEach(([key,title,description])=>{
+const choice=document.createElement('button');choice.type='button';choice.className='choice';choice.dataset.route=key;choice.setAttribute('aria-pressed','false');choice.innerHTML=`<strong>${title}</strong><span>${description}</span>`;choice.addEventListener('click',()=>selectRoute(key));byId('method-buttons').append(choice);
+});selectRoute(platform.methods[0][0],false);
+}));
+byId('previous').addEventListener('click',()=>{if(stepIndex>0){stepIndex--;renderStep();}});
+byId('next').addEventListener('click',()=>{if(stepIndex<routes[activeRoute].steps.length-1){stepIndex++;renderStep();}else{byId('complete').hidden=false;byId('next').disabled=true;}});
+function calculate(){
+const years=Number(byId('years').value),google=byId('google-account').checked,apple=byId('apple-account').checked;
+byId('years-label').textContent=years;byId('years-unit').textContent=years===1?'año':'años';
+byId('cost-total').textContent=`USD ${(google?25:0)+(apple?99*years:0)}`;
+const parts=[];if(google)parts.push('USD 25 de alta en Google');if(apple)parts.push(`USD 99 × ${years} ${years===1?'año':'años'} en Apple`);
+byId('cost-breakdown').textContent=parts.length?parts.join(' + ')+'.':'No seleccionaste cuentas de tienda. Esto no significa que el proyecto no tenga otros costos.';
+}
+['google-account','apple-account','years'].forEach(id=>byId(id).addEventListener('input',calculate));calculate();
+</script>
+</body>
+</html>

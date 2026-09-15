@@ -47,7 +47,7 @@ export function HomePage() {
 
         <Link className="tile" to="/guia">
           <span className="tile-title">Guía de uso</span>
-          <span className="tile-desc">Cómo cargar un pedido paso a paso</span>
+          <span className="tile-desc">Instalar la app por APK y cargar pedidos paso a paso</span>
         </Link>
 
         {isAdmin && (
