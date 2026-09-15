@@ -1,6 +1,7 @@
 type ResumenItem = {
   producto: string;
   cantidad: string | number | null;
+  unidad?: string | null;
   fechaProximoPaso?: string | null;
   descripcion?: string | null;
 };
@@ -43,7 +44,9 @@ export function PedidoResumen({ empresa, fecha, descripcion, items }: Props) {
         <div key={i} className="pedido-resumen-item">
           <div className="pedido-resumen-item-row">
             <strong>{item.producto || 'Sin producto'}</strong>
-            <span className="muted">Cant.: {item.cantidad ?? '—'}</span>
+            <span className="muted">
+              Cant.: {item.cantidad ?? '—'}{item.unidad ? ` ${item.unidad}` : ''}
+            </span>
           </div>
           {(item.fechaProximoPaso || item.descripcion) && (
             <p className="muted pedido-resumen-item-detail">

@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { PedidoResumen } from '../components/PedidoResumen';
-import { SearchableSelect, type SelectOption } from '../components/SearchableSelect';
+import { SearchableSelect } from '../components/SearchableSelect';
 import { useAuth } from '../contexts/AuthContext';
 import { useCompany } from '../contexts/CompanyContext';
 import { useSubmissions } from '../contexts/SubmissionsContext';
 import { useWorkflow } from '../contexts/WorkflowContext';
 import type { ApiError } from '../lib/api-error';
 import { cleanObject, getTodayDate, toNumberOrNull } from '../lib/form-utils';
-import { loadProductoOptions } from '../lib/productos';
+import { loadProductoOptions, type ProductoOption } from '../lib/productos';
 
 type CompraItem = {
   ProductoCodigo: string;
@@ -43,7 +43,7 @@ export function PedidoCompraPage() {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const [productoOptions, setProductoOptions] = useState<SelectOption[]>([]);
+  const [productoOptions, setProductoOptions] = useState<ProductoOption[]>([]);
   const [loadingProductos, setLoadingProductos] = useState(false);
 
   const [fecha, setFecha] = useState(getTodayDate());
@@ -78,6 +78,9 @@ export function PedidoCompraPage() {
 
   const productoLabel = (codigo: string) =>
     productoOptions.find((p) => p.value === codigo)?.label || codigo;
+
+  const productoUnidad = (codigo: string) =>
+    productoOptions.find((p) => p.value === codigo)?.unidad || '';
 
   const addItem = () => setItems((prev) => [...prev, createEmptyItem()]);
 
@@ -240,7 +243,9 @@ export function PedidoCompraPage() {
             />
             <div className="form-row">
               <div className="field narrow">
-                <label>Cantidad</label>
+                <label>
+                  Cantidad{productoUnidad(item.ProductoCodigo) ? ` (${productoUnidad(item.ProductoCodigo)})` : ''}
+                </label>
                 <input
                   type="number"
                   inputMode="decimal"
@@ -311,6 +316,7 @@ export function PedidoCompraPage() {
             .map((item) => ({
               producto: productoLabel(item.ProductoCodigo),
               cantidad: item.Cantidad,
+              unidad: productoUnidad(item.ProductoCodigo),
               fechaProximoPaso: item.FechaProximoPaso,
               descripcion: item.Descripcion,
             }))}
