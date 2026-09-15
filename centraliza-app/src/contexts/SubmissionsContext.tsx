@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getFriendlyError } from '../lib/api-error';
 import { onForeground } from '../lib/foreground';
 import { getFinnegansToken } from '../lib/get-finnegans-token';
 import {
   addSubmission,
+  deleteFailedSubmission,
   getAll,
   getPending,
   initDB,
@@ -39,6 +40,7 @@ type SubmissionsContextType = {
   addAndSubmit: (params: AddParams) => Promise<AddResult>;
   syncPending: () => Promise<void>;
   syncOne: (id: number, updatedPayload?: object) => Promise<void>;
+  removeFailed: (id: number) => Promise<void>;
   refresh: () => Promise<void>;
 };
 
@@ -103,6 +105,8 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [syncing, setSyncing] = useState(false);
   const [ready, setReady] = useState(false);
+  // Evita borrar un ERROR mientras se está reenviando desde esta app.
+  const activeSubmissions = useRef(new Set<number>());
 
   useEffect(() => {
     initDB().then(() => {
@@ -193,23 +197,48 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
 
   async function syncOne(id: number, updatedPayload?: object): Promise<void> {
     if (!user?.token) return;
-    if (updatedPayload !== undefined) {
-      await updateSubmissionPayload(id, JSON.stringify(updatedPayload));
+    if (activeSubmissions.current.has(id)) {
+      throw new Error('Este pedido tiene una operación en curso. Esperá a que termine.');
     }
-    const all = await getAll();
-    const sub = all.find((s) => s.id === id);
-    if (!sub) return;
+    activeSubmissions.current.add(id);
     try {
-      const payload = JSON.parse(sub.payload);
-      await attemptSend(user.token, sub.id, sub.form_type, payload, sub.company_label);
-    } catch {
-      // payload corrupto
+      if (updatedPayload !== undefined) {
+        await updateSubmissionPayload(id, JSON.stringify(updatedPayload));
+      }
+      const all = await getAll();
+      const sub = all.find((s) => s.id === id);
+      if (!sub) return;
+      try {
+        const payload = JSON.parse(sub.payload);
+        await attemptSend(user.token, sub.id, sub.form_type, payload, sub.company_label);
+      } catch {
+        // payload corrupto
+      }
+      await reload();
+    } finally {
+      activeSubmissions.current.delete(id);
     }
-    await reload();
+  }
+
+  async function removeFailed(id: number): Promise<void> {
+    if (activeSubmissions.current.has(id)) {
+      throw new Error('Este pedido tiene una operación en curso. Esperá a que termine.');
+    }
+    activeSubmissions.current.add(id);
+    try {
+      const removed = await deleteFailedSubmission(id);
+      if (!removed) {
+        await reload();
+        throw new Error('El pedido ya no está en estado ERROR o ya fue eliminado.');
+      }
+      setSubmissions((previous) => previous.filter((sub) => sub.id !== id));
+    } finally {
+      activeSubmissions.current.delete(id);
+    }
   }
 
   const value = useMemo<SubmissionsContextType>(
-    () => ({ submissions, syncing, addAndSubmit, syncPending, syncOne, refresh: reload }),
+    () => ({ submissions, syncing, addAndSubmit, syncPending, syncOne, removeFailed, refresh: reload }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [submissions, syncing, user?.token]
   );

@@ -29,6 +29,7 @@ interface LocalDB {
   updatePayload(id: number, payload: string): Promise<void>;
   markSent(id: number): Promise<void>;
   markError(id: number, error_detail: string): Promise<void>;
+  deleteFailed(id: number): Promise<boolean>;
   getPending(): Promise<Submission[]>;
   getAll(): Promise<Submission[]>;
 }
@@ -85,6 +86,16 @@ class WebDB implements LocalDB {
 
   async markError(id: number, error_detail: string): Promise<void> {
     await this.patch(id, { status: 'ERROR', error_detail });
+  }
+
+  async deleteFailed(id: number): Promise<boolean> {
+    // Comprobar el estado y borrar en la misma transacción.
+    const tx = this.idb.transaction('submissions', 'readwrite');
+    const row: Submission | undefined = await tx.store.get(id);
+    const canDelete = row?.status === 'ERROR';
+    if (canDelete) await tx.store.delete(id);
+    await tx.done;
+    return canDelete;
   }
 
   async getPending(): Promise<Submission[]> {
@@ -158,6 +169,14 @@ class NativeDB implements LocalDB {
     ]);
   }
 
+  async deleteFailed(id: number): Promise<boolean> {
+    const result = await this.conn.run(
+      `DELETE FROM submissions WHERE id = ? AND status = 'ERROR'`,
+      [id]
+    );
+    return (result.changes?.changes ?? 0) > 0;
+  }
+
   async getPending(): Promise<Submission[]> {
     const res = await this.conn.query(
       `SELECT * FROM submissions WHERE status = 'PENDING' ORDER BY created_at ASC`
@@ -184,5 +203,6 @@ export const updateSubmissionPayload = (id: number, payload: string) =>
   impl.updatePayload(id, payload);
 export const markSent = (id: number) => impl.markSent(id);
 export const markError = (id: number, error_detail: string) => impl.markError(id, error_detail);
+export const deleteFailedSubmission = (id: number) => impl.deleteFailed(id);
 export const getPending = () => impl.getPending();
 export const getAll = () => impl.getAll();

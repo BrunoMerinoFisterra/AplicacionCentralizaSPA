@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ConfirmModal } from '../components/ConfirmModal';
 import { PedidoResumen } from '../components/PedidoResumen';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubmissions } from '../contexts/SubmissionsContext';
@@ -59,9 +60,14 @@ function ReviewModal({
       return;
     }
     setSending(true);
-    await onRetry(submission.id, parsed);
-    setSending(false);
-    onClose();
+    try {
+      await onRetry(submission.id, parsed);
+      onClose();
+    } catch (err) {
+      setJsonError(err instanceof Error ? err.message : 'No se pudo reenviar el pedido.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -102,10 +108,31 @@ function ReviewModal({
 }
 
 export function EnviosPage() {
-  const { submissions, syncing, syncPending, syncOne, refresh } = useSubmissions();
+  const { submissions, syncing, syncPending, syncOne, removeFailed, refresh } = useSubmissions();
   const { user } = useAuth();
   const [reviewing, setReviewing] = useState<Submission | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState<Submission | null>(null);
+  const [removing, setRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState<string | null>(null);
+  const removingRef = useRef(false);
+
+  const confirmDelete = async () => {
+    if (!deleting || removingRef.current) return;
+    removingRef.current = true;
+    setRemoving(true);
+    setRemoveError(null);
+    try {
+      await removeFailed(deleting.id);
+      setExpandedId((current) => current === deleting.id ? null : current);
+      setDeleting(null);
+    } catch (err) {
+      setRemoveError(err instanceof Error ? err.message : 'No se pudo eliminar el pedido. Intentá de nuevo.');
+    } finally {
+      removingRef.current = false;
+      setRemoving(false);
+    }
+  };
 
   const [serverLogs, setServerLogs] = useState<ServerLog[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
@@ -230,6 +257,12 @@ export function EnviosPage() {
                   <button className="primary" onClick={() => setReviewing(sub)}>
                     Revisar y reenviar
                   </button>
+                  <button className="link-danger" onClick={() => {
+                    setRemoveError(null);
+                    setDeleting(sub);
+                  }}>
+                    Eliminar del historial
+                  </button>
                 </div>
               </>
             )}
@@ -283,6 +316,28 @@ export function EnviosPage() {
           </div>
         );
       })}
+
+      <ConfirmModal
+        visible={deleting !== null}
+        title={`¿Eliminar el pedido #${deleting?.id ?? ''}?`}
+        confirmText={removing ? 'Eliminando...' : 'Eliminar pedido'}
+        busy={removing}
+        destructive
+        onCancel={() => {
+          if (!removingRef.current) setDeleting(null);
+        }}
+        onConfirm={confirmDelete}
+      >
+        <p>
+          Se eliminará este pedido con error de <strong>este dispositivo</strong>
+          {deleting?.company_label ? ` (${deleting.company_label})` : ''}.
+          No podrás recuperarlo ni reenviarlo desde acá.
+        </p>
+        <p className="muted">
+          El registro del servidor se conserva. Esta acción no modifica pedidos en Finnegans.
+        </p>
+        {removeError && <div className="error-box" role="alert">{removeError}</div>}
+      </ConfirmModal>
 
       {reviewing && (
         <ReviewModal
