@@ -26,6 +26,12 @@ Primera vez:
 node migrations/run-migration.js
 ```
 
+Para una instalación existente que todavía no tenga filtros de productos:
+
+```bash
+node migrations/run-migration.js 001_product_filters.sql
+```
+
 ```bash
 node create-user.js <usuario> <clave> "<Nombre Completo>" admin
 ```
@@ -33,7 +39,7 @@ node create-user.js <usuario> <clave> "<Nombre Completo>" admin
 ### Endpoints
 
 - `POST /auth/login` — usuario + password → JWT (7 días)
-- `GET /auth/my-companies`, `GET /auth/my-workflow` — restricciones del usuario
+- `GET /auth/my-companies`, `GET /auth/my-workflow`, `GET /auth/my-product-filters` — restricciones del usuario
 - `GET /finnegans/token` — token OAuth de Finnegans
 - `POST /log`, `GET /log/mine` — auditoría de envíos
 - `GET|POST|PATCH /admin/users*`, `GET /admin/logs`, `GET /admin/finnegans-*` — solo `role='admin'`
@@ -50,6 +56,8 @@ En dev apunta a `http://localhost:3002`. Para producción definir `VITE_API_BASE
 (en `.env.production` para builds locales, y en Vercel → Environment Variables para la web).
 
 El panel de administración está dentro de la app (`/admin`), visible solo para cuentas admin.
+Desde la edición de una cuenta se pueden limitar opcionalmente los productos visibles por rubro,
+familia o ambas dimensiones. Una dimensión sin selecciones no aplica ninguna restricción.
 
 ### Cola offline
 

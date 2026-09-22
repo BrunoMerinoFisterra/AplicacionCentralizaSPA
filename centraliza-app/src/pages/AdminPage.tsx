@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SearchableSelect, type SelectOption } from '../components/SearchableSelect';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE_URL } from '../lib/api';
+import { getProductoCategoryOptions, loadProductoOptions } from '../lib/productos';
 
 type AdminUser = {
   id: number;
@@ -51,6 +52,67 @@ function useAdminApi() {
       return data;
     },
     [user?.token]
+  );
+}
+
+function ProductAssignmentList({
+  title,
+  values,
+  assigned,
+  onChange,
+}: {
+  title: string;
+  values: string[];
+  assigned: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const [filter, setFilter] = useState('');
+  const visible = values.filter((value) =>
+    value.toLocaleLowerCase('es').includes(filter.trim().toLocaleLowerCase('es'))
+  );
+  const toggle = (value: string) => {
+    onChange(assigned.includes(value) ? assigned.filter((item) => item !== value) : [...assigned, value]);
+  };
+
+  return (
+    <div className="product-assignment">
+      <h4>{title}</h4>
+      <div className="field" style={{ marginBottom: '0.5rem' }}>
+        <input
+          type="text"
+          value={filter}
+          onChange={(event) => setFilter(event.target.value)}
+          placeholder={`Buscar ${title.toLocaleLowerCase('es')}...`}
+        />
+      </div>
+      <div className="company-toolbar">
+        <span className="chip">
+          {assigned.length === 0
+            ? 'Sin restricción'
+            : `${assigned.length} seleccionado${assigned.length > 1 ? 's' : ''}`}
+        </span>
+        <span className="spacer" />
+        <button className="link" onClick={() => onChange(values)}>
+          Todos
+        </button>
+        <button className="link" onClick={() => onChange([])}>
+          Sin restricción
+        </button>
+      </div>
+      <div className="company-list">
+        {visible.map((value) => (
+          <label key={value} className="company-item">
+            <input
+              type="checkbox"
+              checked={assigned.includes(value)}
+              onChange={() => toggle(value)}
+            />
+            <span>{value}</span>
+          </label>
+        ))}
+        {visible.length === 0 && <span className="muted">No hay coincidencias.</span>}
+      </div>
+    </div>
   );
 }
 
@@ -324,6 +386,7 @@ function UserEditModal({
   onSaved: () => Promise<void>;
 }) {
   const api = useAdminApi();
+  const { user: currentUser } = useAuth();
   const [fullName, setFullName] = useState(user.full_name ?? '');
   const [role, setRole] = useState<'admin' | 'user'>(user.role);
   const [newPassword, setNewPassword] = useState('');
@@ -335,6 +398,14 @@ function UserEditModal({
   const [assignedCodes, setAssignedCodes] = useState<string[]>([]);
   const [loadingCompanies, setLoadingCompanies] = useState(true);
   const [companyFilter, setCompanyFilter] = useState('');
+
+  // Restricciones opcionales del selector de productos
+  const [rubros, setRubros] = useState<string[]>([]);
+  const [familias, setFamilias] = useState<string[]>([]);
+  const [assignedRubros, setAssignedRubros] = useState<string[]>([]);
+  const [assignedFamilias, setAssignedFamilias] = useState<string[]>([]);
+  const [loadingProductFilters, setLoadingProductFilters] = useState(true);
+  const [productFiltersReady, setProductFiltersReady] = useState(false);
 
   // Workflow
   const [workflows, setWorkflows] = useState<SelectOption[]>([]);
@@ -357,6 +428,22 @@ function UserEditModal({
       } finally {
         setLoadingCompanies(false);
       }
+      try {
+        if (!currentUser?.token) throw new Error('Sesión no disponible.');
+        const [products, productFilters] = await Promise.all([
+          loadProductoOptions(currentUser.token),
+          api(`/users/${user.id}/product-filters`),
+        ]);
+        setRubros(getProductoCategoryOptions(products, 'rubro'));
+        setFamilias(getProductoCategoryOptions(products, 'familia'));
+        setAssignedRubros(productFilters.rubros ?? []);
+        setAssignedFamilias(productFilters.familias ?? []);
+        setProductFiltersReady(true);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoadingProductFilters(false);
+      }
       // Cargas independientes: si una API de Finnegans no está habilitada
       // (p.ej. TipoDocumentoAPI devuelve 501), la otra lista igual se muestra.
       try {
@@ -374,7 +461,7 @@ function UserEditModal({
       }
       setLoadingWf(false);
     })();
-  }, [api, user.id]);
+  }, [api, currentUser?.token, user.id]);
 
   const toggleCompany = (code: string) => {
     setAssignedCodes((prev) =>
@@ -392,6 +479,10 @@ function UserEditModal({
       await api(`/users/${user.id}/companies`, {
         method: 'POST',
         body: JSON.stringify({ codes: assignedCodes }),
+      });
+      await api(`/users/${user.id}/product-filters`, {
+        method: 'POST',
+        body: JSON.stringify({ rubros: assignedRubros, familias: assignedFamilias }),
       });
       // Si el código no está en la lista (carga manual), se guarda igual con el código como nombre.
       const wf = workflows.find((w) => w.value === wfCodigo) ?? null;
@@ -486,6 +577,35 @@ function UserEditModal({
           </>
         )}
 
+        <h3 style={{ marginTop: '1rem' }}>Productos visibles</h3>
+        <p className="muted">
+          Podés limitar el selector por rubros, familias o ambos. Sin selecciones en una lista, esa
+          dimensión no restringe. Si configurás las dos, el producto debe cumplir ambas.
+        </p>
+        {loadingProductFilters ? (
+          <span className="spinner" />
+        ) : !productFiltersReady ? (
+          <div className="error-box">
+            <div className="title">No se pudieron cargar los permisos de productos.</div>
+            <div className="detail">Cerrá esta ventana y volvé a intentar.</div>
+          </div>
+        ) : (
+          <>
+            <ProductAssignmentList
+              title="Rubros"
+              values={rubros}
+              assigned={assignedRubros}
+              onChange={setAssignedRubros}
+            />
+            <ProductAssignmentList
+              title="Familias"
+              values={familias}
+              assigned={assignedFamilias}
+              onChange={setAssignedFamilias}
+            />
+          </>
+        )}
+
         <h3 style={{ marginTop: '1rem' }}>Workflow de compra</h3>
         {loadingWf ? (
           <span className="spinner" />
@@ -530,7 +650,7 @@ function UserEditModal({
           </div>
         )}
         <div className="btn-row">
-          <button className="primary" onClick={save} disabled={saving}>
+          <button className="primary" onClick={save} disabled={saving || !productFiltersReady}>
             {saving ? 'Guardando...' : 'Guardar'}
           </button>
           <button onClick={onClose}>Cancelar</button>

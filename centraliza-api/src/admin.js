@@ -152,6 +152,92 @@ router.post('/users/:id/companies', requireAdmin, async (req, res) => {
   }
 });
 
+// ---------- Rubros y familias de productos asignados ----------
+
+function normalizeNameList(value) {
+  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) return null;
+  const unique = new Map();
+  for (const item of value) {
+    const name = item.trim();
+    if (!name || name.length > 200) return null;
+    const key = name.toLocaleLowerCase('es');
+    if (!unique.has(key)) unique.set(key, name);
+  }
+  return [...unique.values()];
+}
+
+router.get('/users/:id/product-filters', requireAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id)) return res.status(400).json({ error: 'id inválido.' });
+
+    const pool = await getPool();
+    const [rubrosResult, familiasResult] = await Promise.all([
+      pool.request()
+        .input('user_id', sql.Int, id)
+        .query(`SELECT rubro_name FROM centraliza_user_rubros WHERE user_id = @user_id`),
+      pool.request()
+        .input('user_id', sql.Int, id)
+        .query(`SELECT familia_name FROM centraliza_user_familias WHERE user_id = @user_id`),
+    ]);
+    return res.json({
+      rubros: rubrosResult.recordset.map((row) => row.rubro_name),
+      familias: familiasResult.recordset.map((row) => row.familia_name),
+    });
+  } catch (err) {
+    console.error('GET /admin/users/:id/product-filters error', err);
+    return res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+
+router.post('/users/:id/product-filters', requireAdmin, async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (Number.isNaN(id)) return res.status(400).json({ error: 'id inválido.' });
+
+    const rubros = normalizeNameList(req.body?.rubros);
+    const familias = normalizeNameList(req.body?.familias);
+    if (!rubros || !familias) {
+      return res.status(400).json({
+        error: 'rubros y familias deben ser arrays de textos no vacíos de hasta 200 caracteres.',
+      });
+    }
+
+    const pool = await getPool();
+    const tx = new sql.Transaction(pool);
+    await tx.begin();
+    try {
+      await new sql.Request(tx)
+        .input('user_id', sql.Int, id)
+        .query(`DELETE FROM centraliza_user_rubros WHERE user_id = @user_id`);
+      await new sql.Request(tx)
+        .input('user_id', sql.Int, id)
+        .query(`DELETE FROM centraliza_user_familias WHERE user_id = @user_id`);
+
+      for (const rubro of rubros) {
+        await new sql.Request(tx)
+          .input('user_id', sql.Int, id)
+          .input('rubro_name', sql.NVarChar(200), rubro)
+          .query(`INSERT INTO centraliza_user_rubros (user_id, rubro_name) VALUES (@user_id, @rubro_name)`);
+      }
+      for (const familia of familias) {
+        await new sql.Request(tx)
+          .input('user_id', sql.Int, id)
+          .input('familia_name', sql.NVarChar(200), familia)
+          .query(`INSERT INTO centraliza_user_familias (user_id, familia_name) VALUES (@user_id, @familia_name)`);
+      }
+      await tx.commit();
+    } catch (txErr) {
+      await tx.rollback();
+      throw txErr;
+    }
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('POST /admin/users/:id/product-filters error', err);
+    return res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+
 // ---------- Workflow / tipo de documento de compra ----------
 
 router.post('/users/:id/workflow', requireAdmin, async (req, res) => {

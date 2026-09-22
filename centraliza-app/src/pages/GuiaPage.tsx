@@ -323,7 +323,19 @@ export function GuiaPage() {
               </div>
             </GuideStep>
 
-            <GuideStep num={3} title="Configurar el circuito de compra">
+            <GuideStep num={3} title="Limitar los productos visibles (opcional)">
+              <p>
+                En <strong>Productos visibles</strong> podés habilitar rubros, familias o ambos para
+                que la cuenta vea únicamente esos productos en el selector del pedido.
+              </p>
+              <div className="note">
+                Si dejás una lista <strong>Sin restricción</strong>, esa dimensión permite todos sus
+                valores. Si seleccionás rubros y familias, cada producto visible tiene que cumplir
+                las dos condiciones.
+              </div>
+            </GuideStep>
+
+            <GuideStep num={4} title="Configurar el circuito de compra">
               <p>
                 Recién creado, el usuario <strong>todavía no puede enviar pedidos</strong>. Tocá{' '}
                 <strong>Editar</strong> sobre su fila y completá, en la sección Workflow de compra:
@@ -344,7 +356,7 @@ export function GuiaPage() {
               </div>
             </GuideStep>
 
-            <GuideStep num={4} title="Verificar">
+            <GuideStep num={5} title="Verificar">
               <p>
                 En la tabla de usuarios, las columnas <strong>Workflow compra</strong> y{' '}
                 <strong>Tipo doc.</strong> tienen que mostrar valores. Si aparece un guion (—), la

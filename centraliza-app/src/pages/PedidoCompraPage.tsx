@@ -9,7 +9,12 @@ import { useSubmissions } from '../contexts/SubmissionsContext';
 import { useWorkflow } from '../contexts/WorkflowContext';
 import type { ApiError } from '../lib/api-error';
 import { cleanObject, getTodayDate, toNumberOrNull } from '../lib/form-utils';
-import { loadProductoOptions, type ProductoOption } from '../lib/productos';
+import {
+  filterProductoOptions,
+  loadProductoFilters,
+  loadProductoOptions,
+  type ProductoOption,
+} from '../lib/productos';
 
 type CompraItem = {
   ProductoCodigo: string;
@@ -45,20 +50,29 @@ export function PedidoCompraPage() {
 
   const [productoOptions, setProductoOptions] = useState<ProductoOption[]>([]);
   const [loadingProductos, setLoadingProductos] = useState(false);
+  const [productosError, setProductosError] = useState(false);
 
   const [fecha, setFecha] = useState(getTodayDate());
   const [descripcion, setDescripcion] = useState('');
   const [items, setItems] = useState<CompraItem[]>([createEmptyItem()]);
 
   const sinEmpresas = !loadingCompanies && !loadError && companies.length === 0;
+  const sinProductos = !loadingProductos && !productosError && productoOptions.length === 0;
 
   const loadProductos = async () => {
     if (!user?.token) return;
     setLoadingProductos(true);
+    setProductosError(false);
     try {
-      setProductoOptions(await loadProductoOptions(user.token));
+      const [options, filters] = await Promise.all([
+        loadProductoOptions(user.token),
+        loadProductoFilters(user.token),
+      ]);
+      setProductoOptions(filterProductoOptions(options, filters));
     } catch (err) {
       console.error('Error loading productos:', err);
+      setProductoOptions([]);
+      setProductosError(true);
     } finally {
       setLoadingProductos(false);
     }
@@ -223,6 +237,22 @@ export function PedidoCompraPage() {
         </div>
 
         <h3 className="section-title">Ítems</h3>
+        {productosError ? (
+          <div className="error-box">
+            <div className="title">No se pudieron cargar los productos habilitados.</div>
+            <div className="detail">
+              Verificá tu conexión a internet.{' '}
+              <button className="link" onClick={loadProductos}>
+                Reintentar
+              </button>
+            </div>
+          </div>
+        ) : sinProductos ? (
+          <div className="note">
+            Tu cuenta no tiene productos visibles con los rubros y familias configurados. Pedile a
+            un administrador que revise esos permisos.
+          </div>
+        ) : null}
         {items.map((item, index) => (
           <div key={index} className="item-card">
             <div className="item-card-header">
@@ -282,7 +312,7 @@ export function PedidoCompraPage() {
           <button
             className="primary btn-lg"
             onClick={handleSendPress}
-            disabled={loading || sinEmpresas}
+            disabled={loading || sinEmpresas || sinProductos || productosError}
           >
             {loading ? 'Enviando...' : 'Enviar pedido'}
           </button>

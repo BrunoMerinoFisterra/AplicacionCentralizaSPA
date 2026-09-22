@@ -76,6 +76,29 @@ router.get('/my-companies', requireUser, async (req, res) => {
   }
 });
 
+// Filtros opcionales para el selector de productos. Una lista vacía significa
+// que esa dimensión (rubro o familia) no restringe los productos visibles.
+router.get('/my-product-filters', requireUser, async (req, res) => {
+  try {
+    const pool = await getPool();
+    const [rubrosResult, familiasResult] = await Promise.all([
+      pool.request()
+        .input('user_id', sql.Int, req.userId)
+        .query(`SELECT rubro_name FROM centraliza_user_rubros WHERE user_id = @user_id`),
+      pool.request()
+        .input('user_id', sql.Int, req.userId)
+        .query(`SELECT familia_name FROM centraliza_user_familias WHERE user_id = @user_id`),
+    ]);
+    return res.json({
+      rubros: rubrosResult.recordset.map((row) => row.rubro_name),
+      familias: familiasResult.recordset.map((row) => row.familia_name),
+    });
+  } catch (err) {
+    console.error('GET /auth/my-product-filters error', err);
+    return res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+});
+
 // Mismo shape que consume el WorkflowContext (solo compra)
 router.get('/my-workflow', requireUser, async (req, res) => {
   try {
